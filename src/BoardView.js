@@ -1,9 +1,14 @@
 var BoardView = cc.Layer.extend({
-    board: {},//class Board
-    squareSize: 5, //do dai canh 1 o vuong trong bang pixel
-    _width: 50, // do rong cua bang pixel
-    _height: 50, //do dai cua bang pixel
-    pokemons: {},//mang 2 chieu luu anh cua cac o pokemon, moi o la 1 sprite
+    //class Board
+    board: {},
+    //do dai canh 1 o vuong trong bang pixel
+    squareSize: 5,
+    // do rong cua bang pixel
+    _width: 50,
+    //do dai cua bang pixel
+    _height: 50,
+    //mang 2 chieu luu anh cua cac o pokemon, moi o la 1 sprite
+    pokemons: {},
 
     createBoardView: function (board){
         let boardView = new BoardView();
@@ -33,18 +38,36 @@ var BoardView = cc.Layer.extend({
 
     addPokemon: function (row, column, type){
         var pokemon = new cc.Sprite("res/pokemon" + type + ".png");
-        //var pokemon = new cc.Sprite("res/pokemon1.png");
         pokemon.setScaleX(this.squareSize / pokemon.getContentSize().width);
         pokemon.setScaleY(this.squareSize / pokemon.getContentSize().height);
-        var position = this.positionOf(row, column);
+        var position = this.positionOf(row, column)
         pokemon.setPosition(position);
 
         //Event listener
+        var self = this
         var listener = cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
             onTouchBegan: function (touch, event) {
-                var touchLocation = touch.getLocation() - pokemon.getPosition()
+                var touchLocation = cc.p(touch.getLocation().x - self.squareSize, touch.getLocation().y - (cc.Director.getInstance().getVisibleSize().height-self._height)/2)
+                var target = event.getCurrentTarget()//target o day la pokemon
+                //neu diem duoc bam nam trong box chua sprite pokemon
+                if (cc.rectContainsPoint(target.getBoundingBox(), touchLocation)) {
+                    var p = self.findRowAndColumnOfSprite(target)
+                    if (self.board.selectPokemon(p.x, p.y)){
+                        self.removePokemon(self.board.previousX, self.board.previousY)
+                        self.removePokemon(p.x,p.y)
+                        self.board.previousX = -1
+                        self.board.previousY = -1
+                    } else {
+                        self.board.previousX = p.x
+                        self.board.previousY = p.y
+                    }
+                    return true//nuot su kien
+                } else {
+                    return false;//chuyen su kien cho sprite pokemon tiep theo
+                }
+
             }
         })
         cc.eventManager.addListener(listener, pokemon)
@@ -52,25 +75,28 @@ var BoardView = cc.Layer.extend({
     },
 
     positionOf: function (row, column){
-        //
-        return cc.p(column * this.squareSize + this.squareSize/2, this.height - row *this.squareSize -this.squareSize/2);
+        var a = column * this.squareSize + this.squareSize/2
+        var b = this._height - row *this.squareSize -this.squareSize/2
+        var c = this._height
+        return cc.p(column * this.squareSize + this.squareSize/2, this._height - row *this.squareSize -this.squareSize/2);
     },
 
     findRowAndColumnOfSprite: function (node) {
         for (var i = 0; i < this.board.getNRows(); i++) {
             for (var j = 0; j < this.board.getNColumns(); j++) {
                 if (this.pokemons[i][j] == node) {
-                    return [i,j]
+                    return cc.p(i,j)
                 }
             }
         }
-        return [-1, -1]
+        return cc.p(-1, -1)
     },
 
     removePokemon: function (row, column){
         if (this.pokemons[row][column] == null) return false;
         this.board.removePokemon(row, column);
-        this.pokemons[row][column] = null;
+        //this.pokemons[row][column] = null;
+        this.removeChild(this.pokemons[row][column])
         return true;
     }
 })
