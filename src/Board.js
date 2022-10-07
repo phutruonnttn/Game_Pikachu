@@ -1,4 +1,4 @@
-var Board = {
+let Board = cc.Class.extend( {
     n_rows: 10,
     n_columns: 10,
     _pokemons: {},
@@ -22,7 +22,8 @@ var Board = {
             for (var j = 0; j < n_column; j++) {
                 var type;
                 do {
-                    type = Math.random() % n_types;
+                    type = Math.floor(Math.random() * 10) % n_types;
+                    console.log(type)
                 } while (countType[type] >= count[type]);
                 countType[type]++;
                 this.addPokemon(i,j,type+1)
@@ -49,4 +50,4 @@ var Board = {
     removePokemon: function (x,y){
         this._pokemons[x][y] = -1;
     }
-}
+})

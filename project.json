@@ -29,8 +29,8 @@
         "src/HitEffect.js",
         "src/SparkEffect.js",
         "src/Background.js",
+        "src/GameLayerPokemon.js",
         "src/Board.js",
-        "src/BoardView.js",
-        "src/GameLayerPokemon.js"
+        "src/BoardView.js"
     ]
 }
