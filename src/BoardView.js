@@ -17,7 +17,6 @@ var BoardView = cc.Layer.extend({
         return boardView;
     },
 
-
     showBoard: function (){
         let visibleSize = cc.Director.getInstance().getVisibleSize();
         this.squareSize = visibleSize.width / (this.board.getNColumns() + 2);

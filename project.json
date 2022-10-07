@@ -31,6 +31,7 @@
         "src/Background.js",
         "src/GameLayerPokemon.js",
         "src/Board.js",
-        "src/BoardView.js"
+        "src/BoardView.js",
+        "src/Queue.js"
     ]
 }
