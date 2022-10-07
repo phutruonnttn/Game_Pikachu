@@ -5,12 +5,6 @@ var BoardView = cc.Layer.extend({
     _height: 50, //do dai cua bang pixel
     pokemons: {},//mang 2 chieu luu anh cua cac o pokemon, moi o la 1 sprite
 
-    // ctor: function (board){
-    //     this._super();
-    //     this.board = board;
-    //     this.showBoard();
-    // },
-
     createBoardView: function (board){
         let boardView = new BoardView();
         boardView.board = board;
@@ -25,7 +19,6 @@ var BoardView = cc.Layer.extend({
         this._width = this.squareSize * this.board.getNColumns();
         this._height = this.squareSize * this.board.getNRows();
 
-        //fix
         this.setContentSize(this._width, this._height);
 
         this.pokemons = [];
@@ -45,6 +38,16 @@ var BoardView = cc.Layer.extend({
         pokemon.setScaleY(this.squareSize / pokemon.getContentSize().height);
         var position = this.positionOf(row, column);
         pokemon.setPosition(position);
+
+        //Event listener
+        var listener = cc.EventListener.create({
+            event: cc.EventListener.TOUCH_ONE_BY_ONE,
+            swallowTouches: true,
+            onTouchBegan: function (touch, event) {
+                var touchLocation = touch.getLocation() - pokemon.getPosition()
+            }
+        })
+        cc.eventManager.addListener(listener, pokemon)
         return pokemon;
     },
 
@@ -64,7 +67,6 @@ var BoardView = cc.Layer.extend({
         return [-1, -1]
     },
 
-    //fix
     removePokemon: function (row, column){
         if (this.pokemons[row][column] == null) return false;
         this.board.removePokemon(row, column);
