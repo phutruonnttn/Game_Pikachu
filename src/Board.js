@@ -32,6 +32,22 @@ let Board = cc.Class.extend( {
         }
     },
 
+    getPreviousX: function (){
+        return this.previousX
+    },
+
+    getPreviousY: function (){
+        return this.previousY
+    },
+
+    setPreviousX: function (x){
+        this.previousX = x
+    },
+
+    setPreviousY: function (y){
+        this.previousY = y
+    },
+
     getNRows: function (){
         return this.n_rows;
     },
@@ -63,7 +79,7 @@ let Board = cc.Class.extend( {
 
     canConnect: function (preX, preY, x , y) {
         var path = this.findPath(preX, preY, x, y)
-        return path >= 2 && path <= 4
+        return path.length >= 2 && path.length <= 4
     },
 
     findPath: function (preX, preY, x , y) {
@@ -116,13 +132,14 @@ let Board = cc.Class.extend( {
         }
 
         //trace back
-        var count = 0
+        var res = new Array()
         if (trace[s.x][s.y].x != -1) {
-            while (s.x != -2) {
-                count++
+            while (s.x != -2)
+            {
+                res.push(cc.p(s.x-1, s.y-1))
                 s = trace[s.x][s.y]
             }
         }
-        return count;
+        return res;
     }
 })

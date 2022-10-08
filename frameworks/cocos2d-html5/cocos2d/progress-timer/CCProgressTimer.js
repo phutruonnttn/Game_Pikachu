@@ -255,7 +255,7 @@ cc.ProgressTimer = cc.Node.extend(/** @lends cc.ProgressTimer# */{
     /**
      * set Progress type of cc.ProgressTimer
      * @function
-     * @param {cc.ProgressTimer.TYPE_RADIAL|cc.ProgressTimer.TYPE_BAR} type
+     * @param {Number} type
      */
     setType: function(type){
         if (type !== this._type){

@@ -48,19 +48,29 @@ var BoardView = cc.Layer.extend({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             swallowTouches: true,
             onTouchBegan: function (touch, event) {
+                //fix lai neu thay doi kieu bang
                 var touchLocation = cc.p(touch.getLocation().x - self.squareSize, touch.getLocation().y - (cc.Director.getInstance().getVisibleSize().height-self._height)/2)
                 var target = event.getCurrentTarget()//target o day la pokemon
                 //neu diem duoc bam nam trong box chua sprite pokemon
                 if (cc.rectContainsPoint(target.getBoundingBox(), touchLocation)) {
                     var p = self.findRowAndColumnOfSprite(target)
+                    self.removeChoosePokemonEffect();
                     if (self.board.selectPokemon(p.x, p.y)){
-                        self.removePokemon(self.board.previousX, self.board.previousY)
-                        self.removePokemon(p.x,p.y)
-                        self.board.previousX = -1
-                        self.board.previousY = -1
+                        self.connectPokemons(self.board.getPreviousX(), self.board.getPreviousY(),p.x,p.y)
+                        self.board.setPreviousX(-1)
+                        self.board.setPreviousY(-1)
+                        // if (MW.SOUND) {
+                        //     cc.audioEngine.setMusicVolume(0.4);
+                        //     cc.audioEngine.playMusic("res/Music/pikachuu.mp3", false)
+                        // }
                     } else {
-                        self.board.previousX = p.x
-                        self.board.previousY = p.y
+                        self.createChoosePokemonEffect(self.pokemons[p.x][p.y])
+                        self.board.setPreviousX(p.x)
+                        self.board.setPreviousY(p.y)
+                        // if (MW.SOUND) {
+                        //     cc.audioEngine.setMusicVolume(0.4);
+                        //     cc.audioEngine.playMusic("res/Music/pika.mp3", false)
+                        // }
                     }
                     return true//nuot su kien
                 } else {
@@ -91,11 +101,70 @@ var BoardView = cc.Layer.extend({
         return cc.p(-1, -1)
     },
 
-    removePokemon: function (row, column){
-        if (this.pokemons[row][column] == null) return false;
-        this.board.removePokemon(row, column);
-        //this.pokemons[row][column] = null;
-        this.removeChild(this.pokemons[row][column])
+    createChoosePokemonEffect: function (pokemon) {
+        var emitter = new cc.ParticleFlower()
+        var square = pokemon.getBoundingBox()
+        emitter.setPosition(square.x, square.y)
+        emitter.setScale(0.2)
+
+        // Tao hieu ung particle chay quanh pokemon
+        var moveUp = cc.moveBy(0.2, cc.p(0, this.squareSize))
+        var moveRight = cc.moveBy(0.2, cc.p(this.squareSize, 0))
+        var moveDown = cc.moveBy(0.2, cc.p(0, -this.squareSize))
+        var moveLeft = cc.moveBy(0.2, cc.p(-this.squareSize, 0))
+        var sequence = cc.sequence(moveUp, moveRight, moveDown, moveLeft).repeatForever()
+        emitter.runAction(sequence);
+
+        // Chay hieu ung
+        this.addChild(emitter, 2);
+        emitter.setName("choosePokemon");
+    },
+
+    removeChoosePokemonEffect: function (){
+        if (this.getChildByName("choosePokemon") != null) {
+            this.removeChildByName("choosePokemon")
+        }
+    },
+
+    removePokemon: function (targer, p){
+        if (targer.pokemons[p.x][p.y] == null) return false;
+        targer.board.removePokemon(p.x, p.y);
+        targer.removeChild(targer.pokemons[p.x][p.y])
         return true;
+    },
+
+    connectPokemons: function (x,y,_x,_y){
+        //1: Hieu ung noi 2 pokemon
+        var connectEffect = this.getConnectEffect(x,y,_x,_y)
+
+        //2: Hieu ung lam mo 2 pokemon
+        var pokemonFade1 = cc.TargetedAction.create(this.pokemons[x][y], cc.FadeOut.create(0.5))
+        var pokemonFade2 = cc.TargetedAction.create(this.pokemons[_x][_y], cc.FadeOut.create(0.5))
+        var effectSpawn = cc.spawn(pokemonFade1,pokemonFade2)
+
+        //3: Xoa 2 pokemon
+        var removePokemon1 = cc.callFunc(this.removePokemon,this,cc.p(x,y))
+        var removePokemon2 = cc.callFunc(this.removePokemon, this, cc.p(_x, _y))
+        var removePokemonSpawn = cc.spawn(removePokemon1, removePokemon2)
+
+        // Sequence (1,2,3)
+        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn)
+        this.runAction(sequence)
+    },
+
+    getConnectEffect: function (x,y,_x,_y){
+        var path = this.board.findPath(x,y,_x,_y)
+        var emitter = new cc.ParticleFlower()
+        this.addChild(emitter)
+        emitter.setScale(0.5)
+        var duration = 0.3
+        emitter.duration = duration
+        emitter.setPosition(this.positionOf(path[0].x, path[0].y))
+
+        var actions = new Array()
+        for (var i=1; i<path.length; i++){
+            actions.push(cc.moveTo(duration/(path.length-1), this.positionOf(path[i].x, path[i].y)))
+        }
+        return cc.targetedAction(emitter, cc.sequence(actions))
     }
 })
