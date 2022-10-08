@@ -16,7 +16,7 @@ let Board = cc.Class.extend( {
             }
         }
 
-        var countType = {};
+        var countType = {}
         for (var i = 0; i< n_types; i++) {
             countType[i] = 0;
         }
@@ -24,7 +24,7 @@ let Board = cc.Class.extend( {
             for (var j = 0; j < n_column; j++) {
                 var type;
                 do {
-                    type = Math.floor(Math.random() * 10) % n_types;
+                    type = Math.floor(Math.random() * 100) % n_types;
                 } while (countType[type] >= count[type]);
                 countType[type]++;
                 this.addPokemon(i,j,type+1)

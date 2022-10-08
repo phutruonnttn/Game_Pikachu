@@ -10,7 +10,11 @@ var GameLayerPokemon = cc.Layer.extend({
         return true;
     },
     showBoard: function (){
-        var board = new Board(8, 8, 8,[8,8,8,8,8,8,8,8])
+        var count = new Array()
+        for (var i=0; i<16; i++){
+            count.push(16)
+        }
+        var board = new Board(16, 16, 16, count)
         this.boardView = new BoardView().createBoardView(board)
         this.addChild(this.boardView, 1)
         var x = (cc.Director.getInstance().getVisibleSize().width - this.boardView.getContentSize().width) / 2;
@@ -35,12 +39,12 @@ var GameLayerPokemon = cc.Layer.extend({
         progressTimer.setBarChangeRate(cc.p(1.0,0.0))
         //Đặt ban đầu 100%
         progressTimer.setPercentage(100)
-        progressTimer.setScale(visibleSize.width/progressTimer.getContentSize().width)
+        progressTimer.setScale((visibleSize.width*5)/(progressTimer.getContentSize().width*6))
         progressTimer.setPosition(visibleSize.width/2, board.y / 2)
         this.addChild(progressTimer)
         //Chạy đếm ngược từ 100% về 0% trong vòng 60 giây.
         //progressTimer.runAction(cc.ProgressFromTo.create(10,100,0))
-        var to = cc.sequence(cc.progressTo(5, 0), cc.progressTo(0, 100));
+        var to = cc.sequence(cc.progressTo(60, 0), cc.progressTo(0, 100));
         progressTimer.runAction(to.repeatForever())
     }
 })
