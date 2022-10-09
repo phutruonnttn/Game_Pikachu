@@ -4,30 +4,38 @@ let Board = cc.Class.extend( {
     _pokemons: {},
     previousX: -1,
     previousY: -1,
+    countType: new Array(),
+    types: 16,
 
     ctor: function (n_rows, n_column, n_types, count){
         this.n_rows = n_rows;
         this.n_columns = n_column;
-
+        this.countType = count
+        this.types = n_types
         for (var i = 0; i < n_rows; i++){
             this._pokemons[i] = [];
             for (var j = 0; j < n_column; j++){
-                this._pokemons[i][j] = -1;
+                this._pokemons[i][j] = -2;
             }
         }
+        this.generateTablePokemons()
+    },
 
+    generateTablePokemons: function () {
         var countType = {}
-        for (var i = 0; i< n_types; i++) {
+        for (var i = 0; i< this.types; i++) {
             countType[i] = 0;
         }
-        for (var i = 0; i < n_rows; i++) {
-            for (var j = 0; j < n_column; j++) {
-                var type;
-                do {
-                    type = Math.floor(Math.random() * 100) % n_types;
-                } while (countType[type] >= count[type]);
-                countType[type]++;
-                this.addPokemon(i,j,type+1)
+        for (var i = 0; i < this.n_rows; i++) {
+            for (var j = 0; j < this.n_columns; j++) {
+                if (this._pokemons[i][j] != -1) {
+                    var type;
+                    do {
+                        type = Math.floor(Math.random() * 100) % this.types;
+                    } while (countType[type] >= this.countType[type]);
+                    countType[type]++;
+                    this.addPokemon(i,j,type+1)
+                }
             }
         }
     },
@@ -65,6 +73,7 @@ let Board = cc.Class.extend( {
     },
 
     removePokemon: function (x,y){
+        this.countType[this._pokemons[x][y]-1] --
         this._pokemons[x][y] = -1;
     },
 
@@ -80,6 +89,10 @@ let Board = cc.Class.extend( {
     canConnect: function (preX, preY, x , y) {
         var path = this.findPath(preX, preY, x, y)
         return path.length >= 2 && path.length <= 4
+    },
+
+    checkExistSolution: function () {
+        return true
     },
 
     findPath: function (preX, preY, x , y) {

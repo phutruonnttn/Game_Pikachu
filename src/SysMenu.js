@@ -66,6 +66,11 @@ var SysMenu = cc.Layer.extend({
         //     cc.audioEngine.playMusic(cc.sys.os == cc.sys.OS_WP8 || cc.sys.os == cc.sys.OS_WINRT ? res.mainMainMusic_wav : res.mainMainMusic_mp3, true);
         // }
 
+        if (MW.SOUND) {
+            cc.audioEngine.setMusicVolume(0.4);
+            cc.audioEngine.playMusic("res/Music/RiverFlowsInYou.mp3", true)
+        }
+
         return true;
     },
     initBackGround:function()
