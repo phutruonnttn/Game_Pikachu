@@ -1,13 +1,13 @@
 var BoardView = cc.Layer.extend({
     //class Board
     board: {},
-    //do dai canh 1 o vuong trong bang pixel
+    //Độ dài cạnh 1 ô vuông trong bàn chơi (pixel)
     squareSize: 5,
-    // do rong cua bang pixel
+    //Độ rộng của board view
     _width: 50,
-    //do dai cua bang pixel
+    //Độ dài của board view
     _height: 50,
-    //mang 2 chieu luu anh cua cac o pokemon, moi o la 1 sprite
+    //Bảng row x column sprite của từng pokemon
     pokemons: {},
 
     createBoardView: function (board){

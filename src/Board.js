@@ -1,12 +1,21 @@
 let Board = cc.Class.extend( {
+    //Số hàng của bảng chứa type từng pokemon
     n_rows: 10,
+    //Số cột của bảng chứa type từng pokemon
     n_columns: 10,
+    //Bảng row x column type của từng pokemon
     _pokemons: {},
+    //Tọa độ x của pokemon đang được chọn
     previousX: -1,
+    //Tọa độ y của pokemon đang được chọn
     previousY: -1,
+    //Số lượng pokemon còn lại của mỗi type
     countType: {},
+    //Số lượng type pokemon
     types: 16,
-    typePosions: {},
+    //Vị trí từng pokemon theo mỗi type
+    typePositions: {},
+    //Số pokemon còn lại trên bàn chơi
     countRemainingPokemon: 0,
 
     ctor: function (n_rows, n_column, n_types, count){
@@ -26,10 +35,10 @@ let Board = cc.Class.extend( {
 
     generateTablePokemons: function () {
         var countType = {}
-        this.typePosions = new Array()
+        this.typePositions = new Array()
         for (var i = 0; i< this.types; i++) {
             countType[i] = 0;
-            this.typePosions.push([])
+            this.typePositions.push([])
         }
         for (var i = 0; i < this.n_rows; i++) {
             for (var j = 0; j < this.n_columns; j++) {
@@ -39,7 +48,7 @@ let Board = cc.Class.extend( {
                         type = Math.floor(Math.random() * 100) % this.types;
                     } while (countType[type] >= this.countType[type]);
                     countType[type]++;
-                    this.typePosions[type].push(cc.p(i,j))
+                    this.typePositions[type].push(cc.p(i,j))
                     this.addPokemon(i,j,type+1)
                 }
             }
@@ -115,11 +124,11 @@ let Board = cc.Class.extend( {
         for (var i = 0; i < this.getNRows(); i++) {
             for (var j = 0; j < this.getNColumns(); j++){
                 if (this.getPokemon(i,j) != -1) {
-                    for (var k = 0; k < this.typePosions[this.getPokemon(i,j)-1].length; k++) {
-                        var t = this.typePosions[this.getPokemon(i,j)-1][k]
+                    for (var k = 0; k < this.typePositions[this.getPokemon(i,j)-1].length; k++) {
+                        var t = this.typePositions[this.getPokemon(i,j)-1][k]
                         var s = cc.p(i+1, j+1)
                         if (s.x == t.x+1 && s.y == t.y+1) continue
-                        var trace = this.breadthFirstSearch(s,cc.p(t.x+1,t.y+1),e,true)
+                        var trace = this.breadthFirstSearch(s,cc.p(t.x+1,t.y+1),e)
                         var countP = 0
                         if (trace[s.x][s.y].x != -1) {
                             while (s.x != -2) {
@@ -152,7 +161,7 @@ let Board = cc.Class.extend( {
         var s = cc.p(preX+1, preY+1)
         var t = cc.p(x+1, y+1)
         //bfs
-        var trace = this.breadthFirstSearch(s,t,e, true)
+        var trace = this.breadthFirstSearch(s,t,e)
 
         //trace back
         var res = new Array()
@@ -165,9 +174,7 @@ let Board = cc.Class.extend( {
         return res;
     },
 
-    breadthFirstSearch: function (s,t,e,flagPruning) {
-        var pruning
-        if (flagPruning) pruning = 3
+    breadthFirstSearch: function (s,t,e) {
         var trace = []
         var stepCount = []
         for (var i = 0; i < this.getNRows()+2; i++) {
@@ -191,7 +198,7 @@ let Board = cc.Class.extend( {
                 var x = u.x + dx[i];
                 var y = u.y + dy[i];
                 while (x >= 0 && x < this.getNRows()+2 && y>=0 && y < this.getNColumns()+2 && e[x][y] == 0) {
-                    if (trace[x][y].x == -1 && stepCount[u.x][u.y]+1 <= pruning) {
+                    if (trace[x][y].x == -1 && stepCount[u.x][u.y]+1 <= 3) {
                         stepCount[x][y] = stepCount[u.x][u.y]+1
                         trace[x][y] = u;
                         q.enqueue(cc.p(x, y))

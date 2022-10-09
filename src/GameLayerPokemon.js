@@ -23,7 +23,6 @@ var GameLayerPokemon = cc.Layer.extend({
         // }
         // var board = new Board(4, 4, 4, count)
 
-
         //2x2
         // for (var i=0; i<2; i++){
         //     count.push(2)
