@@ -19,6 +19,9 @@ var BoardView = cc.Layer.extend({
 
     showBoard: function (){
         this.removeAllChildren(true)
+        while (!this.board.checkExistSolution()) {
+            this.board.generateTablePokemons()
+        }
         let visibleSize = cc.Director.getInstance().getVisibleSize();
         this.squareSize = visibleSize.width / (this.board.getNColumns() + 2);
         this._width = this.squareSize * this.board.getNColumns();
@@ -134,6 +137,7 @@ var BoardView = cc.Layer.extend({
         }
     },
 
+    //nhung ham viet cho callFunc phai viet rieng ???
     removePokemon: function (targer, p){
         if (targer.pokemons[p.x][p.y] == null) return false;
         targer.board.removePokemon(p.x, p.y);
@@ -158,7 +162,10 @@ var BoardView = cc.Layer.extend({
         //4: Check con nuoc di tiep khong?
         var checkSolution = cc.callFunc(this.checkExistSolution, this)
 
-        // Sequence (1,2,3,4)
+        //5: removeChoosePokemonEffect
+        //callFunc(this.removeChoosePokemonEffect)
+
+        // Sequence (1,2,3,4...)
         var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution)
         this.runAction(sequence)
 
