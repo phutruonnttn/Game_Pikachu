@@ -10,25 +10,11 @@ var GameLayerPokemon = cc.Layer.extend({
         return true;
     },
     showBoard: function (){
-        var count = new Array()
-        //16x16
-        // for (var i=0; i<32; i++){
-        //     count.push(8)
-        // }
-        // var board = new Board(16, 16, 32, count)
-
-        //4x4
-        // for (var i=0; i<4; i++){
-        //     count.push(4)
-        // }
-        // var board = new Board(4, 4, 4, count)
-
-        //2x2
-        for (var i=0; i<2; i++){
-            count.push(2)
+        var count = []
+        for (var i=0; i< MW.NTYPES; i++){
+            count.push(MW.N_EACH_OF_TYPE)
         }
-        var board = new Board(2, 2, 2, count)
-
+        var board = new Board(MW.NROWS, MW.NCOLUMNS, MW.NTYPES, count)
         this.boardView = new BoardView().createBoardView(board)
         this.addChild(this.boardView, 1)
         var x = (cc.Director.getInstance().getVisibleSize().width - this.boardView.getContentSize().width) / 2;
@@ -38,7 +24,6 @@ var GameLayerPokemon = cc.Layer.extend({
     showProgressTimer: function (){
         let visibleSize = cc.Director.getInstance().getVisibleSize();
         let board = this.boardView.getBoundingBox()
-
         var progressTimer = new cc.ProgressTimer(new cc.Sprite("res/ProgressBar.png"));
         progressTimer.type = cc.ProgressTimer.TYPE_BAR
         //Đặt tâm ở điểm giữa trái. Ảnh của progressTimer sẽ thu về phía Midpoint.

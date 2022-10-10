@@ -1,21 +1,16 @@
 var BoardView = cc.Layer.extend({
-    // //class Board
-    // board: {},
-    // //Độ dài cạnh 1 ô vuông trong bàn chơi (pixel)
-    // squareSize: 5,
-    // //Độ rộng của board view
-    // _width: 50,
-    // //Độ dài của board view
-    // _height: 50,
-    // //Bảng row x column sprite của từng pokemon
-    // pokemons: {},
+    // board: class Board
+    // squareSize: Độ dài cạnh 1 ô vuông trong bàn chơi (pixel)
+    // _width: Độ rộng của board view
+    // _height: Độ dài của board view
+    // pokemons: Bảng row x column sprite của từng pokemon
 
     createBoardView: function (board){
         let boardView = new BoardView();
         boardView.board = board;
-        boardView.squareSize = 5
-        boardView._width = 50
-        boardView._height = 50
+        boardView.squareSize = 0
+        boardView._width = 0
+        boardView._height = 0
         boardView.pokemons = {}
         boardView.showBoard();
         return boardView;
@@ -30,14 +25,12 @@ var BoardView = cc.Layer.extend({
         this.squareSize = visibleSize.width / (this.board.getNColumns() + 2);
         this._width = this.squareSize * this.board.getNColumns();
         this._height = this.squareSize * this.board.getNRows();
-
         this.setContentSize(this._width, this._height);
-
         this.pokemons = [];
         for (var i = 0; i < this.board.getNRows(); i++) {
             this.pokemons[i] = [];
             for (var j = 0; j < this.board.getNColumns(); j++) {
-                if (this.board.getPokemon(i,j) != -1) {
+                if (this.board.getPokemon(i,j) !== -1) {
                     this.pokemons[i][j] = this.addPokemon(i,j,this.board.getPokemon(i,j));
                     this.addChild(this.pokemons[i][j]);
                 }
@@ -121,7 +114,6 @@ var BoardView = cc.Layer.extend({
         var square = pokemon.getBoundingBox()
         emitter.setPosition(square.x, square.y)
         emitter.setScale(0.2)
-
         // Tao hieu ung particle chay quanh pokemon
         var moveUp = cc.moveBy(0.2, cc.p(0, this.squareSize))
         var moveRight = cc.moveBy(0.2, cc.p(this.squareSize, 0))
@@ -129,7 +121,6 @@ var BoardView = cc.Layer.extend({
         var moveLeft = cc.moveBy(0.2, cc.p(-this.squareSize, 0))
         var sequence = cc.sequence(moveUp, moveRight, moveDown, moveLeft).repeatForever()
         emitter.runAction(sequence);
-
         // Chay hieu ung
         this.addChild(emitter, 2);
         emitter.setName("choosePokemon");
@@ -151,27 +142,22 @@ var BoardView = cc.Layer.extend({
     connectPokemons: function (x,y,_x,_y){
         //1: Hieu ung noi 2 pokemon
         var connectEffect = this.getConnectEffect(x,y,_x,_y)
-
         //2: Hieu ung lam mo 2 pokemon
         var pokemonFade1 = cc.TargetedAction.create(this.pokemons[x][y], cc.FadeOut.create(0.3))
         var pokemonFade2 = cc.TargetedAction.create(this.pokemons[_x][_y], cc.FadeOut.create(0.3))
         var effectSpawn = cc.spawn(pokemonFade1,pokemonFade2)
-
         //3: Xoa 2 pokemon
-        var removePokemon1 = cc.callFunc(function (target){//khong co target cung duoc
+        var removePokemon1 = cc.callFunc(function (target){
             this.removePokemon(cc.p(x,y));
         }.bind(this))
-        var removePokemon2 = cc.callFunc(function (target){//khong co target cung duoc
+        var removePokemon2 = cc.callFunc(function (target){
             this.removePokemon(cc.p(_x,_y));
         }.bind(this))
         var removePokemonSpawn = cc.spawn(removePokemon1, removePokemon2)
-
-        //4: Check con nuoc di tiep khong?
+        //4: Check con nuoc di tiep khong
         var checkSolution = cc.callFunc(this.checkExistSolution, this)
-
         //5: removeChoosePokemonEffect
         //callFunc(this.removeChoosePokemonEffect)
-
         // Sequence (1,2,3,4...)
         var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution)
         this.runAction(sequence)
@@ -192,7 +178,7 @@ var BoardView = cc.Layer.extend({
         var duration = 0.5
         emitter.duration = duration
         emitter.setPosition(this.positionOf(path[0].x, path[0].y))
-        var actions = new Array()
+        var actions = []
         for (var i=1; i<path.length; i++){
             actions.push(cc.moveTo(duration/(path.length-1), this.positionOf(path[i].x, path[i].y)))
         }

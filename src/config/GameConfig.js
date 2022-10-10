@@ -2,6 +2,13 @@
 
 var MW = MW || {};
 
+MW.NROWS = 10;
+MW.NCOLUMNS = 10;
+// Max 32
+MW.NTYPES = 25;
+// MW.NROWS * MW.NCOLUMNS = MW.NTYPES * MW.N_EACH_OF_TYPE
+MW.N_EACH_OF_TYPE = 4
+
 //game state
 MW.GAME_STATE = {
     HOME:0,
