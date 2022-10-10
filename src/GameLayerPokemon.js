@@ -12,10 +12,10 @@ var GameLayerPokemon = cc.Layer.extend({
     showBoard: function (){
         var count = new Array()
         //16x16
-        for (var i=0; i<32; i++){
-            count.push(8)
-        }
-        var board = new Board(16, 16, 32, count)
+        // for (var i=0; i<32; i++){
+        //     count.push(8)
+        // }
+        // var board = new Board(16, 16, 32, count)
 
         //4x4
         // for (var i=0; i<4; i++){
@@ -24,10 +24,10 @@ var GameLayerPokemon = cc.Layer.extend({
         // var board = new Board(4, 4, 4, count)
 
         //2x2
-        // for (var i=0; i<2; i++){
-        //     count.push(2)
-        // }
-        // var board = new Board(2, 2, 2, count)
+        for (var i=0; i<2; i++){
+            count.push(2)
+        }
+        var board = new Board(2, 2, 2, count)
 
         this.boardView = new BoardView().createBoardView(board)
         this.addChild(this.boardView, 1)
@@ -44,9 +44,7 @@ var GameLayerPokemon = cc.Layer.extend({
         //Đặt tâm ở điểm giữa trái. Ảnh của progressTimer sẽ thu về phía Midpoint.
         progressTimer.setMidpoint(cc.p(0.0,0.5))
         //Đặt tỷ lệ thay đổi của 2 chiều ngang, dọc.
-
-        progressTimer.setBarChangeRate(cc.p(1.0,0.0))//chua ro
-
+        progressTimer.setBarChangeRate(cc.p(1.0,0.0))
         //Đặt ban đầu 100%
         progressTimer.setPercentage(100)
         progressTimer.setScale(visibleSize.width/progressTimer.getContentSize().width)

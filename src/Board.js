@@ -1,28 +1,32 @@
 let Board = cc.Class.extend( {
-    //Số hàng của bảng chứa type từng pokemon
-    n_rows: 10,
-    //Số cột của bảng chứa type từng pokemon
-    n_columns: 10,
-    //Bảng row x column type của từng pokemon
-    _pokemons: {},
-    //Tọa độ x của pokemon đang được chọn
-    previousX: -1,
-    //Tọa độ y của pokemon đang được chọn
-    previousY: -1,
-    //Số lượng pokemon còn lại của mỗi type
-    countType: {},
-    //Số lượng type pokemon
-    types: 16,
-    //Vị trí từng pokemon theo mỗi type
-    typePositions: {},
-    //Số pokemon còn lại trên bàn chơi
-    countRemainingPokemon: 0,
+    // //Số hàng của bảng chứa type từng pokemon
+    // n_rows: 10,
+    // //Số cột của bảng chứa type từng pokemon
+    // n_columns: 10,
+    // //Bảng row x column type của từng pokemon
+    // _pokemons: {},
+    // //Tọa độ x của pokemon đang được chọn
+    // previousX: -1,
+    // //Tọa độ y của pokemon đang được chọn
+    // previousY: -1,
+    // //Số lượng pokemon còn lại của mỗi type
+    // countType: {},
+    // //Số lượng type pokemon
+    // types: 16,
+    // //Vị trí từng pokemon theo mỗi type
+    // typePositions: {},
+    // //Số pokemon còn lại trên bàn chơi
+    // countRemainingPokemon: 0,
 
     ctor: function (n_rows, n_column, n_types, count){
         this.n_rows = n_rows;
         this.n_columns = n_column;
         this.countType = count
         this.types = n_types
+        this.previousX = -1
+        this.previousY = -1
+        this._pokemons = {}
+        this.typePositions = {}
         this.countRemainingPokemon = n_rows * n_column
         for (var i = 0; i < n_rows; i++){
             this._pokemons[i] = [];

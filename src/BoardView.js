@@ -1,18 +1,22 @@
 var BoardView = cc.Layer.extend({
-    //class Board
-    board: {},
-    //Độ dài cạnh 1 ô vuông trong bàn chơi (pixel)
-    squareSize: 5,
-    //Độ rộng của board view
-    _width: 50,
-    //Độ dài của board view
-    _height: 50,
-    //Bảng row x column sprite của từng pokemon
-    pokemons: {},
+    // //class Board
+    // board: {},
+    // //Độ dài cạnh 1 ô vuông trong bàn chơi (pixel)
+    // squareSize: 5,
+    // //Độ rộng của board view
+    // _width: 50,
+    // //Độ dài của board view
+    // _height: 50,
+    // //Bảng row x column sprite của từng pokemon
+    // pokemons: {},
 
     createBoardView: function (board){
         let boardView = new BoardView();
         boardView.board = board;
+        boardView.squareSize = 5
+        boardView._width = 50
+        boardView._height = 50
+        boardView.pokemons = {}
         boardView.showBoard();
         return boardView;
     },
@@ -137,11 +141,10 @@ var BoardView = cc.Layer.extend({
         }
     },
 
-    //nhung ham viet cho callFunc phai viet rieng ???
-    removePokemon: function (targer, p){
-        if (targer.pokemons[p.x][p.y] == null) return false;
-        targer.board.removePokemon(p.x, p.y);
-        targer.removeChild(targer.pokemons[p.x][p.y])
+    removePokemon: function (p){
+        if (this.pokemons[p.x][p.y] == null) return false;
+        this.board.removePokemon(p.x, p.y);
+        this.removeChild(this.pokemons[p.x][p.y])
         return true;
     },
 
@@ -155,8 +158,12 @@ var BoardView = cc.Layer.extend({
         var effectSpawn = cc.spawn(pokemonFade1,pokemonFade2)
 
         //3: Xoa 2 pokemon
-        var removePokemon1 = cc.callFunc(this.removePokemon,this,cc.p(x,y))
-        var removePokemon2 = cc.callFunc(this.removePokemon, this, cc.p(_x, _y))
+        var removePokemon1 = cc.callFunc(function (target){//khong co target cung duoc
+            this.removePokemon(cc.p(x,y));
+        }.bind(this))
+        var removePokemon2 = cc.callFunc(function (target){//khong co target cung duoc
+            this.removePokemon(cc.p(_x,_y));
+        }.bind(this))
         var removePokemonSpawn = cc.spawn(removePokemon1, removePokemon2)
 
         //4: Check con nuoc di tiep khong?
@@ -168,7 +175,6 @@ var BoardView = cc.Layer.extend({
         // Sequence (1,2,3,4...)
         var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution)
         this.runAction(sequence)
-
     },
 
     checkExistSolution: function (target){
