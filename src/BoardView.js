@@ -157,9 +157,11 @@ var BoardView = cc.Layer.extend({
         //4: Check con nuoc di tiep khong
         var checkSolution = cc.callFunc(this.checkExistSolution, this)
         //5: removeChoosePokemonEffect
-        //callFunc(this.removeChoosePokemonEffect)
+        var removeChoooseEffect = cc.callFunc(function (target){
+            this.removeChoosePokemonEffect();
+        }.bind(this))
         // Sequence (1,2,3,4...)
-        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution)
+        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution, removeChoooseEffect)
         this.runAction(sequence)
     },
 
