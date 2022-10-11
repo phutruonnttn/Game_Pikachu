@@ -53,7 +53,7 @@ var SysMenu = cc.Layer.extend({
         label.y = 80;
 
         if (MW.SOUND) {
-            cc.audioEngine.setMusicVolume(0.4);
+            cc.audioEngine.setMusicVolume(MW.SOUND_VOLUMN);
             cc.audioEngine.playMusic(res.soundMain, true)
         }
         return true;

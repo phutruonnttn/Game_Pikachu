@@ -99,7 +99,7 @@ let Board = cc.Class.extend( {
             var p = this.listCanConnect[x][y][i]
             this.listCanConnect[p.x][p.y].splice(this.listCanConnect[p.x][p.y].indexOf(cc.p(x,y)),1)
         }
-        this.listCanConnect[x][y].splice(0,this.listCanConnect[x][y].length)
+        this.listCanConnect[x][y] = []
     },
 
     selectPokemon: function (x,y){

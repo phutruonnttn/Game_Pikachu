@@ -30,8 +30,17 @@ MW.NCOLUMNS_HARD = 10;
 MW.NTYPES_HARD = 25;
 MW.N_EACH_OF_TYPE_HARD = 4;
 
-// Other config
+// Choose effect
+MW.DURATION_CHOOSE_EFFECT = 0.3
+MW.REVERT_COLOR = {r:255, g:255, b:255}
+MW.EFFECT_COLOR = {r:223, g:225, b:225}
+MW.NAME_CHOOSE_POKEMON = "choosePokemon"
+
+// Sound
+MW.SOUND_VOLUMN = 0.4
 MW.SOUND = true;
+
+// Other config
 MW.FLAREY = 445;
 MW.SCALE = 1.5;
 MW.WIDTH = 480;

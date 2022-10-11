@@ -7,6 +7,7 @@ var GameLayerPokemon = cc.Layer.extend({
     init:function () {
         this.showBoard();
         this.showProgressTimer();
+        this.showHintButton();
         return true;
     },
     showBoard: function (){
@@ -38,5 +39,30 @@ var GameLayerPokemon = cc.Layer.extend({
         //Chạy đếm ngược từ 100% về 0% trong vòng 60 giây.
         var to = cc.sequence(cc.progressTo(300, 0), cc.progressTo(0, 100));
         progressTimer.runAction(to.repeatForever())
+    },
+
+    showHintButton: function (){
+        cc.MenuItemFont.setFontSize(24);
+        cc.MenuItemFont.setFontName("Arial");
+        var self = this
+        //var hint = new cc.MenuItemFont("Hint", this.onHint);
+
+        var hint = new cc.MenuItemFont("Hint", function (target){
+            this.onHint();
+        }.bind(this))
+
+
+        hint.setColor(cc.color(MW.FONTCOLOR));
+        let visibleSize = cc.Director.getInstance().getVisibleSize();
+        let board = this.boardView.getBoundingBox()
+        hint.setPosition(visibleSize.width*3/4, board.y + board.height +  board.y/ 2)
+        var menu = new cc.Menu(hint);
+        menu.x = 0;
+        menu.y = 0;
+        this.addChild(menu);
+    },
+
+    onHint: function () {
+        this.boardView.showHint()
     }
 })

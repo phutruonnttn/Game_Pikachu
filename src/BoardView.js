@@ -79,14 +79,14 @@ var BoardView = cc.Layer.extend({
 
     soundChoosePokemonEffect: function () {
         if (MW.SOUND) {
-            cc.audioEngine.setMusicVolume(0.4);
+            cc.audioEngine.setMusicVolume(MW.SOUND_VOLUMN);
             cc.audioEngine.playMusic(res.soundChoosePokemonEffect, false)
         }
     },
 
     soundRemovePokemonEffect: function () {
         if (MW.SOUND) {
-            cc.audioEngine.setMusicVolume(0.4);
+            cc.audioEngine.setMusicVolume(MW.SOUND_VOLUMN);
             cc.audioEngine.playMusic(res.soundRemovePokemonEffect, false)
         }
     },
@@ -109,7 +109,7 @@ var BoardView = cc.Layer.extend({
         return cc.p(-1, -1)
     },
 
-    createChoosePokemonEffect: function (pokemon) {
+    createChoosePokemonEffectByParticle: function (pokemon) {
         var emitter = new cc.ParticleFlower()
         var square = pokemon.getBoundingBox()
         emitter.setPosition(square.x, square.y)
@@ -123,12 +123,33 @@ var BoardView = cc.Layer.extend({
         emitter.runAction(sequence);
         // Chay hieu ung
         this.addChild(emitter, 2);
-        emitter.setName("choosePokemon");
+        emitter.setName(MW.NAME_CHOOSE_POKEMON);
+    },
+
+    removeChoosePokemonEffectByParticle: function (){
+        if (this.getChildByName(MW.NAME_CHOOSE_POKEMON) != null) {
+            this.removeChildByName(MW.NAME_CHOOSE_POKEMON)
+        }
+    },
+
+    createChoosePokemonEffect: function (pokemon) {
+        var tintTo = cc.tintTo(MW.DURATION_CHOOSE_EFFECT, MW.EFFECT_COLOR.r,MW.EFFECT_COLOR.g,MW.EFFECT_COLOR.b)
+        var tintRevert = cc.tintTo(MW.DURATION_CHOOSE_EFFECT,MW.REVERT_COLOR.r,MW.REVERT_COLOR.g,MW.REVERT_COLOR.b)
+        var sequence = cc.sequence(tintTo,tintRevert).repeatForever()
+        try {
+            pokemon.setName(MW.NAME_CHOOSE_POKEMON);
+            pokemon.runAction(sequence)
+        } catch (e){
+            var a = 3
+        }
+
     },
 
     removeChoosePokemonEffect: function (){
-        if (this.getChildByName("choosePokemon") != null) {
-            this.removeChildByName("choosePokemon")
+        while (this.getChildByName(MW.NAME_CHOOSE_POKEMON) != null) {
+            this.getChildByName(MW.NAME_CHOOSE_POKEMON).stopAllActions()
+            this.getChildByName(MW.NAME_CHOOSE_POKEMON).runAction(cc.tintTo(MW.DURATION_CHOOSE_EFFECT,MW.REVERT_COLOR.r,MW.REVERT_COLOR.g,MW.REVERT_COLOR.b))
+            this.getChildByName(MW.NAME_CHOOSE_POKEMON).setName("")
         }
     },
 
@@ -156,12 +177,9 @@ var BoardView = cc.Layer.extend({
         var removePokemonSpawn = cc.spawn(removePokemon1, removePokemon2)
         //4: Check con nuoc di tiep khong
         var checkSolution = cc.callFunc(this.checkExistSolution, this)
-        //5: removeChoosePokemonEffect
-        var removeChoooseEffect = cc.callFunc(function (target){
-            this.removeChoosePokemonEffect();
-        }.bind(this))
-        // Sequence (1,2,3,4,5)
-        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution, removeChoooseEffect)
+
+        // Sequence (1,2,3,4)
+        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution)
         this.runAction(sequence)
     },
 
@@ -185,5 +203,21 @@ var BoardView = cc.Layer.extend({
             actions.push(cc.moveTo(duration/(path.length-1), this.positionOf(path[i].x, path[i].y)))
         }
         return cc.targetedAction(emitter, cc.sequence(actions))
+    },
+
+    showHint: function (){
+        this.removeChoosePokemonEffect()
+        for (var i = 0; i < this.board.getNRows(); i++) {
+            for (var j = 0; j < this.board.getNColumns(); j++) {
+                if (this.board.getPokemon(i, j) !== -1) {
+                    if (this.board.listCanConnect[i][j].length > 0) {
+                        var p = this.board.listCanConnect[i][j][0]
+                        this.createChoosePokemonEffect(this.pokemons[i][j])
+                        this.createChoosePokemonEffect(this.pokemons[p.x][p.y])
+                        return
+                    }
+                }
+            }
+        }
     }
 })
