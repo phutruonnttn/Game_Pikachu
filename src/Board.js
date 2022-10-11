@@ -56,10 +56,12 @@ let Board = cc.Class.extend( {
                 if (this.getPokemon(i,j) !== -1) {
                     for (var k = 0; k<this.typePositions[this.getPokemon(i,j)-1].length; k++){
                         var p = this.typePositions[this.getPokemon(i,j)-1][k]
-                        if (p.x!==i || p.y !== j) {
-                            var stepCount = this.breadthFirstSearch(cc.p(p.x+1,p.y+1),cc.p(i+1,j+1),e,false)
-                            if (1<=stepCount[p.x+1][p.y+1] && stepCount[p.x+1][p.y+1]<=3){
-                                this.listCanConnect[i][j].push(p)
+                        if (this.getPokemon(p.x, p.y) != -1){
+                            if (p.x!==i || p.y !== j) {
+                                var stepCount = this.breadthFirstSearch(cc.p(p.x+1,p.y+1),cc.p(i+1,j+1),e,false)
+                                if (1<=stepCount[p.x+1][p.y+1] && stepCount[p.x+1][p.y+1]<=3){
+                                    this.listCanConnect[i][j].push(p)
+                                }
                             }
                         }
                     }
@@ -93,13 +95,21 @@ let Board = cc.Class.extend( {
     removePokemon: function (x,y){
         this.countType[this._pokemons[x][y]-1]--
         this.countRemainingPokemon--
-        this._pokemons[x][y] = -1;
+        this._pokemons[x][y] = -1
         //Cap nhat lai mang listCanConnect
         for (var i = 0; i< this.listCanConnect[x][y].length; i++){
             var p = this.listCanConnect[x][y][i]
-            this.listCanConnect[p.x][p.y].splice(this.listCanConnect[p.x][p.y].indexOf(cc.p(x,y)),1)
+            var listP = this.listCanConnect[p.x][p.y]
+            var delIndex = -1
+            for (var j = 0; j<listP.length; j++){
+                if (listP[j].x == x && listP[j].y == y) {
+                    delIndex = j;
+                    break
+                }
+            }
+            this.listCanConnect[p.x][p.y].splice(delIndex,1)
         }
-        this.listCanConnect[x][y] = []
+        this.listCanConnect[x][y].splice(0,this.listCanConnect[x][y].length)
     },
 
     selectPokemon: function (x,y){

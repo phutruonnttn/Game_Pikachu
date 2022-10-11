@@ -44,14 +44,9 @@ var GameLayerPokemon = cc.Layer.extend({
     showHintButton: function (){
         cc.MenuItemFont.setFontSize(24);
         cc.MenuItemFont.setFontName("Arial");
-        var self = this
-        //var hint = new cc.MenuItemFont("Hint", this.onHint);
-
         var hint = new cc.MenuItemFont("Hint", function (target){
             this.onHint();
         }.bind(this))
-
-
         hint.setColor(cc.color(MW.FONTCOLOR));
         let visibleSize = cc.Director.getInstance().getVisibleSize();
         let board = this.boardView.getBoundingBox()

@@ -33,7 +33,7 @@ MW.N_EACH_OF_TYPE_HARD = 4;
 // Choose effect
 MW.DURATION_CHOOSE_EFFECT = 0.3
 MW.REVERT_COLOR = {r:255, g:255, b:255}
-MW.EFFECT_COLOR = {r:223, g:225, b:225}
+MW.EFFECT_COLOR = {r:192, g:192, b:192}
 MW.NAME_CHOOSE_POKEMON = "choosePokemon"
 
 // Sound
