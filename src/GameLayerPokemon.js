@@ -24,7 +24,7 @@ var GameLayerPokemon = cc.Layer.extend({
     showProgressTimer: function (){
         let visibleSize = cc.Director.getInstance().getVisibleSize();
         let board = this.boardView.getBoundingBox()
-        var progressTimer = new cc.ProgressTimer(new cc.Sprite("res/ProgressBar.png"));
+        var progressTimer = new cc.ProgressTimer(new cc.Sprite(res.progressBar));
         progressTimer.type = cc.ProgressTimer.TYPE_BAR
         //Đặt tâm ở điểm giữa trái. Ảnh của progressTimer sẽ thu về phía Midpoint.
         progressTimer.setMidpoint(cc.p(0.0,0.5))
@@ -36,7 +36,6 @@ var GameLayerPokemon = cc.Layer.extend({
         progressTimer.setPosition(visibleSize.width/2, board.y / 2)
         this.addChild(progressTimer)
         //Chạy đếm ngược từ 100% về 0% trong vòng 60 giây.
-        //progressTimer.runAction(cc.ProgressFromTo.create(10,100,0))
         var to = cc.sequence(cc.progressTo(300, 0), cc.progressTo(0, 100));
         progressTimer.runAction(to.repeatForever())
     }

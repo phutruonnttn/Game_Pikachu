@@ -32,7 +32,6 @@ var SysMenu = cc.Layer.extend({
         flare.visible = false;
         var newGame = new cc.MenuItemSprite(newGameNormal, newGameSelected, newGameDisabled, function () {
             this.onButtonEffect();
-            //this.onNewGame();
             flareEffect(flare, this, this.onNewGame);
         }.bind(this));
         var gameSettings = new cc.MenuItemSprite(gameSettingsNormal, gameSettingsSelected, gameSettingsDisabled, this.onSettings, this);
@@ -53,40 +52,21 @@ var SysMenu = cc.Layer.extend({
         label.x = winSize.width  / 2;
         label.y = 80;
 
-        // this.schedule(this.update, 0.1);
-        //
-        // this._ship = new cc.Sprite("#ship03.png");
-        // this.addChild(this._ship, 0, 4);
-        // this._ship.x = Math.random() * winSize.width;
-        // this._ship.y = 0;
-        // this._ship.runAction(cc.moveBy(2, cc.p(Math.random() * winSize.width, this._ship.y + winSize.height + 100)));
-        //
-        // if (MW.SOUND) {
-        //     cc.audioEngine.setMusicVolume(0.7);
-        //     cc.audioEngine.playMusic(cc.sys.os == cc.sys.OS_WP8 || cc.sys.os == cc.sys.OS_WINRT ? res.mainMainMusic_wav : res.mainMainMusic_mp3, true);
-        // }
-
         if (MW.SOUND) {
             cc.audioEngine.setMusicVolume(0.4);
-            cc.audioEngine.playMusic("res/Music/RiverFlowsInYou.mp3", true)
+            cc.audioEngine.playMusic(res.soundMain, true)
         }
-
         return true;
     },
     initBackGround:function()
     {
-        //Add code here
-        var loading = cc.Sprite("res/loading.png");
-        var logo = cc.Sprite("/res/logo.png")
-        //var logoBack = cc.Sprite("/res/logoBack.png")
+        var loading = cc.Sprite(res.loading_png);
+        var logo = cc.Sprite(res.logo_png)
         loading.setScale(0.6)
         loading.setPosition(250,400)
         logo.setScale(0.4)
         logo.setPosition(330,650)
-        // logoBack.setScale(1.5)
-        // logoBack.setPosition(250,550)
         this.addChild(loading)
-        //this.addChild(logoBack)
         this.addChild(logo)
     },
 
@@ -96,7 +76,6 @@ var SysMenu = cc.Layer.extend({
             cc.audioEngine.stopMusic();
             cc.audioEngine.stopAllEffects();
             var scene = new cc.Scene();
-            //scene.addChild(new GameLayer());
             scene.addChild(new GameLayerPokemon());
             scene.addChild(new GameControlMenu());
 	        cc.director.runScene(new cc.TransitionFade(1.2, scene));
@@ -114,16 +93,6 @@ var SysMenu = cc.Layer.extend({
         scene.addChild(new AboutLayer());
 	    cc.director.runScene(new cc.TransitionFade(1.2, scene));
     },
-    // update:function () {
-    //     if (this._ship.y > 750) {
-    //         this._ship.x = Math.random() * winSize.width;
-	//         this._ship.y = 10;
-    //         this._ship.runAction(cc.moveBy(
-    //             parseInt(5 * Math.random(), 10),
-    //             cc.p(Math.random() * winSize.width, this._ship.y + 750)
-    //         ));
-    //     }
-    // },
     onButtonEffect:function(){
         if (MW.SOUND) {
             var s = cc.audioEngine.playEffect(cc.sys.os == cc.sys.OS_WINDOWS || cc.sys.os == cc.sys.OS_WINRT ? res.buttonEffet_wav : res.buttonEffet_mp3);

@@ -6,9 +6,8 @@ var SettingsLayer = cc.Layer.extend({
     },
     init:function () {
         var sp = new cc.Sprite(res.loading_png);
-        sp.anchorX = 0;
-        sp.anchorY = 0;
-        sp.scale = MW.SCALE;
+        sp.setScale(0.6)
+        sp.setPosition(250,400)
         this.addChild(sp, 0, 1);
 
         var cacheImage = cc.textureCache.addImage(res.menuTitle_png);
@@ -41,11 +40,13 @@ var SettingsLayer = cc.Layer.extend({
 
         cc.MenuItemFont.setFontName("Arial");
         cc.MenuItemFont.setFontSize(26);
+
         var item2 = new cc.MenuItemToggle(
             new cc.MenuItemFont("Easy"),
             new cc.MenuItemFont("Normal"),
             new cc.MenuItemFont("Hard"));
         item2.setColor(cc.color(MW.FONTCOLOR));
+        item2.setSelectedIndex(MW.CURRENT_MODE)
         item2.setCallback( this.onModeControl );
 
 
@@ -73,7 +74,7 @@ var SettingsLayer = cc.Layer.extend({
         MW.SOUND = !MW.SOUND;
         var audioEngine = cc.audioEngine;
         if(MW.SOUND){
-            audioEngine.playMusic(cc.sys.os == cc.sys.OS_WP8 || cc.sys.os == cc.sys.OS_WINRT ? res.mainMainMusic_wav : res.mainMainMusic_mp3);
+            cc.audioEngine.playMusic(res.soundMain, true)
         }
         else{
             audioEngine.stopMusic();
@@ -81,5 +82,23 @@ var SettingsLayer = cc.Layer.extend({
         }
     },
     onModeControl:function(){
+        var selectedIndex = this.getSelectedIndex()
+        MW.CURRENT_MODE = selectedIndex
+        if (selectedIndex == MW.INDEX_EASY) {
+            MW.NROWS = MW.NROWS_EASY
+            MW.NCOLUMNS = MW.NCOLUMNS_EASY;
+            MW.NTYPES = MW.NTYPES_EASY;
+            MW.N_EACH_OF_TYPE = MW.N_EACH_OF_TYPE_EASY;
+        } else if (selectedIndex == MW.INDEX_NORMAL){
+            MW.NROWS = MW.NROWS_NORMAL
+            MW.NCOLUMNS = MW.NCOLUMNS_NORMAL
+            MW.NTYPES = MW.NTYPES_NORMAL
+            MW.N_EACH_OF_TYPE = MW.N_EACH_OF_TYPE_NORMAL
+        } else if (selectedIndex == MW.INDEX_HARD) {
+            MW.NROWS = MW.NROWS_HARD
+            MW.NCOLUMNS = MW.NCOLUMNS_HARD
+            MW.NTYPES = MW.NTYPES_HARD
+            MW.N_EACH_OF_TYPE = MW.N_EACH_OF_TYPE_HARD
+        }
     }
 });

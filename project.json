@@ -12,7 +12,6 @@
         "src/Resource.js",
         "src/GameConfig.js",
         "src/Effect.js",
-        "src/GameController.js",
         "src/GameControlMenu.js",
         "src/AboutLayer.js",
         "src/SettingsLayer.js",

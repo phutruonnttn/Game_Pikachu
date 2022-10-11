@@ -80,14 +80,14 @@ var BoardView = cc.Layer.extend({
     soundChoosePokemonEffect: function () {
         if (MW.SOUND) {
             cc.audioEngine.setMusicVolume(0.4);
-            cc.audioEngine.playMusic("res/Music/choose.mp3", false)
+            cc.audioEngine.playMusic(res.soundChoosePokemonEffect, false)
         }
     },
 
     soundRemovePokemonEffect: function () {
         if (MW.SOUND) {
             cc.audioEngine.setMusicVolume(0.4);
-            cc.audioEngine.playMusic("res/Music/remove.mp3", false)
+            cc.audioEngine.playMusic(res.soundRemovePokemonEffect, false)
         }
     },
 
@@ -160,7 +160,7 @@ var BoardView = cc.Layer.extend({
         var removeChoooseEffect = cc.callFunc(function (target){
             this.removeChoosePokemonEffect();
         }.bind(this))
-        // Sequence (1,2,3,4...)
+        // Sequence (1,2,3,4,5)
         var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution, removeChoooseEffect)
         this.runAction(sequence)
     },
