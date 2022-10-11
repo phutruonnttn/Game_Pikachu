@@ -17,7 +17,7 @@ MW.GameController = cc.Class.extend({
             this._curScene = s;
             if (this._curScene) {
                 this._curScene.onEnter();
-	            cc.director.runScene(s);
+                cc.director.runScene(s);
             }
         }
     },
