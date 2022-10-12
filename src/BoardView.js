@@ -32,6 +32,8 @@ var BoardView = cc.Layer.extend({
             for (var j = 0; j < this.board.getNColumns(); j++) {
                 if (this.board.getPokemon(i,j) !== -1) {
                     this.pokemons[i][j] = this.addPokemon(i,j,this.board.getPokemon(i,j));
+                    // this.pokemons[i][j].i = i;
+                    // this.pokemons[i][j].j = j;
                     this.addChild(this.pokemons[i][j]);
                 }
             }
@@ -51,6 +53,11 @@ var BoardView = cc.Layer.extend({
             onTouchBegan: function (touch, event) {
                 var touchLocation = cc.p(touch.getLocation().x - self.squareSize, touch.getLocation().y - (cc.Director.getInstance().getVisibleSize().height-self._height)/2)
                 var target = event.getCurrentTarget() //target: pokemon
+
+                // var aa = self.findRowAndColumnOfSprite(target)
+                //
+                // cc.log("Position: "+aa.x + " " + aa.y)
+
                 if (cc.rectContainsPoint(target.getBoundingBox(), touchLocation)) {
                     var p = self.findRowAndColumnOfSprite(target)
                     self.removeChoosePokemonEffect();
@@ -73,6 +80,7 @@ var BoardView = cc.Layer.extend({
                 }
             }
         })
+        pokemon.listener = listener
         cc.eventManager.addListener(listener, pokemon)
         return pokemon;
     },
@@ -92,9 +100,6 @@ var BoardView = cc.Layer.extend({
     },
 
     positionOf: function (row, column){
-        var a = column * this.squareSize + this.squareSize/2
-        var b = this._height - row *this.squareSize -this.squareSize/2
-        var c = this._height
         return cc.p(column * this.squareSize + this.squareSize/2, this._height - row *this.squareSize -this.squareSize/2);
     },
 
@@ -136,13 +141,8 @@ var BoardView = cc.Layer.extend({
         var tintTo = cc.tintTo(MW.DURATION_CHOOSE_EFFECT, MW.EFFECT_COLOR.r,MW.EFFECT_COLOR.g,MW.EFFECT_COLOR.b)
         var tintRevert = cc.tintTo(MW.DURATION_CHOOSE_EFFECT,MW.REVERT_COLOR.r,MW.REVERT_COLOR.g,MW.REVERT_COLOR.b)
         var sequence = cc.sequence(tintTo,tintRevert).repeatForever()
-        try {
-            pokemon.setName(MW.NAME_CHOOSE_POKEMON);
-            pokemon.runAction(sequence)
-        } catch (e){
-            var a = 3
-        }
-
+        pokemon.setName(MW.NAME_CHOOSE_POKEMON);
+        pokemon.runAction(sequence)
     },
 
     removeChoosePokemonEffect: function (){
@@ -156,7 +156,9 @@ var BoardView = cc.Layer.extend({
     removePokemon: function (p){
         if (this.pokemons[p.x][p.y] == null) return false;
         this.board.removePokemon(p.x, p.y);
+        //cc.eventManager.removeListener(this.pokemons[p.x][p.y].listener)
         this.removeChild(this.pokemons[p.x][p.y])
+        //this.pokemons[p.x][p.y] = null;
         return true;
     },
 
@@ -166,20 +168,28 @@ var BoardView = cc.Layer.extend({
         //2: Hieu ung lam mo 2 pokemon
         var pokemonFade1 = cc.TargetedAction.create(this.pokemons[x][y], cc.FadeOut.create(0.3))
         var pokemonFade2 = cc.TargetedAction.create(this.pokemons[_x][_y], cc.FadeOut.create(0.3))
-        var effectSpawn = cc.spawn(pokemonFade1,pokemonFade2)
+        var pokemonScale1 = cc.TargetedAction.create(this.pokemons[x][y], cc.ScaleTo.create(0.3,0.0))
+        var pokemonScale2 = cc.TargetedAction.create(this.pokemons[_x][_y], cc.ScaleTo.create(0.3,0.0))
+        var effectSpawn = cc.spawn(pokemonFade1, pokemonScale1,pokemonFade2,pokemonScale2)
         //3: Xoa 2 pokemon
-        var removePokemon1 = cc.callFunc(function (target){
+        var removePokemon = cc.callFunc(function (target){
             this.removePokemon(cc.p(x,y));
-        }.bind(this))
-        var removePokemon2 = cc.callFunc(function (target){
             this.removePokemon(cc.p(_x,_y));
         }.bind(this))
-        var removePokemonSpawn = cc.spawn(removePokemon1, removePokemon2)
+
         //4: Check con nuoc di tiep khong
         var checkSolution = cc.callFunc(this.checkExistSolution, this)
 
-        // Sequence (1,2,3,4)
-        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemonSpawn, checkSolution)
+        //5: Board run
+        var boardUp = null
+        if (MW.BOARD_RUN == 1){
+            boardUp = cc.callFunc(function (targer) {
+                this.boardUp(x,y,_x,_y);
+            }.bind(this))
+        }
+
+        // Sequence (1,2,3,4,5)
+        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, checkSolution,boardUp)
         this.runAction(sequence)
     },
 
@@ -205,6 +215,21 @@ var BoardView = cc.Layer.extend({
         return cc.targetedAction(emitter, cc.sequence(actions))
     },
 
+    traceIndex: function (){
+        let line = '';
+        for (var i = 0; i < this.board.getNRows(); i++) {
+            for (var j = 0; j < this.board.getNColumns(); j++) {
+                if(this.pokemons[i][j]){
+                    this.pokemons[i][j] = -1;
+                    line += this.pokemons[i][j].i + ',' + this.pokemons[i][j].j + ' - ';
+                }
+                else line += '-----'
+            }
+            cc.log(line);
+            line = '';
+        }
+    },
+
     showHint: function (){
         this.removeChoosePokemonEffect()
         for (var i = 0; i < this.board.getNRows(); i++) {
@@ -219,5 +244,55 @@ var BoardView = cc.Layer.extend({
                 }
             }
         }
+    },
+
+    //Goi ham sau khi da remove 2 o (x,y) va (_x,_y)
+    boardUp: function (x,y,_x,_y){
+        var tmpPokemon = {}
+        var afterPosition = {}
+        for (var i=0; i<this.board.getNRows(); i++){
+            tmpPokemon[i] = []
+            afterPosition[i] = []
+            for (var j=0; j<this.board.getNColumns(); j++){
+                tmpPokemon[i][j] = this.board.getPokemon(i,j)
+                afterPosition[i][j] = cc.p(-1,-1)
+            }
+        }
+        var column = [y,_y]
+        if (y==_y) column.pop()
+        var row = [x, _x]
+        for (var i = 0; i< column.length; i++){
+            var current = -1
+            var run = 0
+            while (run<this.board.getNRows()){
+                var p = tmpPokemon[run][column[i]]
+                if (p!=-1){
+                    tmpPokemon[run][column[i]] = -1
+                    tmpPokemon[++current][column[i]] = p
+                    // tmpPokemon[current][column[i]].i = current;
+                    // tmpPokemon[current][column[i]].j = column[i];
+                    afterPosition[run][column[i]] = cc.p(current,column[i])
+                }
+                run++
+            }
+        }
+        this.moveUp(afterPosition)
+        this.board.boardUpdatePosition(tmpPokemon)
+
+        //this.traceIndex()
+    },
+
+    moveUp: function (afterPosition){
+        for (var i=0; i<this.board.getNRows(); i++){
+            for (var j=0; j<this.board.getNColumns(); j++){
+                if (afterPosition[i][j].x != -1 ) {
+                    //cc.log(i + " " +j)
+                    this.pokemons[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemons[i][j]
+                    var moveUp = cc.moveTo(0.2, this.positionOf(afterPosition[i][j].x,afterPosition[i][j].y))
+                    this.pokemons[i][j].runAction(moveUp)
+                }
+            }
+        }
+        //this.traceIndex();
     }
 })

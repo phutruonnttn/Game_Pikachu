@@ -92,6 +92,14 @@ let Board = cc.Class.extend( {
         }
     },
 
+    boardUpdatePosition: function (tmpPokemon) {
+        for (var i = 0; i < this.n_rows; i++) {
+            for (var j = 0; j < this.n_columns; j++) {
+                this.addPokemon(i,j,tmpPokemon[i][j])
+            }
+        }
+    },
+
     removePokemon: function (x,y){
         this.countType[this._pokemons[x][y]-1]--
         this.countRemainingPokemon--
@@ -113,9 +121,16 @@ let Board = cc.Class.extend( {
     },
 
     selectPokemon: function (x,y){
-        if ((this.previousX === -1 && this.previousY === -1) || this._pokemons[x][y] !== this._pokemons[this.previousX][this.previousY]
-            || !this.canConnect(this.previousX, this.previousY, x, y)
-            || (this.previousX === x && this.previousY === y)) {
+        if (this.previousX === -1 && this.previousY === -1) {
+            return false;
+        }
+        if (this._pokemons[x][y] !== this._pokemons[this.previousX][this.previousY]) {
+            return false;
+        }
+        if (!this.canConnect(this.previousX, this.previousY, x, y)) {
+            return false;
+        }
+        if (this.previousX === x && this.previousY === y) {
             return false;
         }
         return true;

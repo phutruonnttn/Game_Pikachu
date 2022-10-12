@@ -46,12 +46,6 @@ var SysMenu = cc.Layer.extend({
         menu.x = winSize.width / 2;
         menu.y = winSize.height / 2 - 140;
 
-        var label = new cc.LabelTTF("Power by Cocos2d-JS", "Arial", 21);
-        label.setColor(cc.color(MW.FONTCOLOR));
-        this.addChild(label, 1);
-        label.x = winSize.width  / 2;
-        label.y = 80;
-
         if (MW.SOUND) {
             cc.audioEngine.setMusicVolume(MW.SOUND_VOLUMN);
             cc.audioEngine.playMusic(res.soundMain, true)
