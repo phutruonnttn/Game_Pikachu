@@ -9,6 +9,7 @@ let Board = cc.Class.extend( {
     // typePositions: Vị trí từng pokemon theo mỗi type
     // countRemainingPokemon: Số pokemon còn lại trên bàn chơi
     // listCanConnect[i][j]: Tọa độ các pokemon khác mà pokemon[i][j] kết nối được
+    // countRemainingOfListCanConnect: số cặp còn lại trong listCanConnect
 
     ctor: function (n_rows, n_column, n_types, count){
         this.n_rows = n_rows;
@@ -21,6 +22,7 @@ let Board = cc.Class.extend( {
         this.typePositions = {}
         this.countRemainingPokemon = n_rows * n_column
         this.listCanConnect = {}
+        this.countRemainingOfListCanConnect = 0
         for (var i = 0; i < n_rows; i++){
             this.pokemonTypeTable[i] = [];
             this.listCanConnect[i] = []
@@ -51,6 +53,7 @@ let Board = cc.Class.extend( {
 
     //Co the toi uu: bfs xong moi for type
     generateListCanConnect: function (){
+        this.countRemainingOfListCanConnect = 0
         var e = this.initTableForBFS()
         for (var i = 0; i < this.n_rows; i++){
             for (var j = 0; j < this.n_columns; j++){
@@ -60,11 +63,17 @@ let Board = cc.Class.extend( {
                         var p = this.typePositions[this.getPokemon(i,j)-1][k]
                         if (this.getPokemon(p.x, p.y) != -1){
                             if (p.x!==i || p.y !== j) {
+                                if ((p.x==i-1 && p.y==j) || (p.x==i+1 && p.y==j) || (p.x==i && p.y==j-1) || (p.x==i && p.y==j+1)){
+                                    this.listCanConnect[i][j].push(p)
+                                    this.countRemainingOfListCanConnect++
+                                    continue
+                                }
                                 var pInBFS = cc.p(p.x+1,p.y+1)
                                 var stepTo = Math.min(stepCount[pInBFS.x][pInBFS.y],stepCount[pInBFS.x-1][pInBFS.y]+1,
                                     stepCount[pInBFS.x][pInBFS.y-1]+1,stepCount[pInBFS.x+1][pInBFS.y]+1,stepCount[pInBFS.x][pInBFS.y+1]+1)
                                 if (MW.MIN_STEP_COUNT<=stepTo && stepTo<=MW.MAX_STEP_COUNT) {
                                     this.listCanConnect[i][j].push(p)
+                                    this.countRemainingOfListCanConnect++
                                 }
                             }
                         }
@@ -119,8 +128,12 @@ let Board = cc.Class.extend( {
                     break
                 }
             }
-            this.listCanConnect[p.x][p.y].splice(delIndex,1)
+            if (delIndex!=-1) {
+                this.listCanConnect[p.x][p.y].splice(delIndex,1)
+                this.countRemainingOfListCanConnect--
+            }
         }
+        this.countRemainingOfListCanConnect = this.countRemainingOfListCanConnect - this.listCanConnect[x][y].length
         this.listCanConnect[x][y].splice(0,this.listCanConnect[x][y].length)
     },
 
@@ -155,6 +168,9 @@ let Board = cc.Class.extend( {
                     for (var i2 = 0; i2 < this.getNRows(); i2++) {
                         for (var j2 = 0; j2 < this.getNColumns(); j2++) {
                             if (this.getPokemon(i2,j2) == this.getPokemon(i,j) && (i!=i2 || j!=j2)) {
+                                if ((i2==i-1 && j2==j) || (i2==i+1 && j2==j) || (i2==i && j2==j-1) || (i2==i && j2==j+1)){
+                                   return true
+                                }
                                 var p = cc.p(i2+1,j2+1)
                                 var stepTo = Math.min(stepCount[p.x][p.y],stepCount[p.x-1][p.y]+1,stepCount[p.x][p.y-1]+1,
                                     stepCount[p.x+1][p.y]+1,stepCount[p.x][p.y+1]+1)
@@ -180,16 +196,22 @@ let Board = cc.Class.extend( {
     },
 
     checkListCanConnect: function (){
-        for (var i = 0; i < this.getNRows(); i++) {
-            for (var j = 0; j < this.getNColumns(); j++) {
-                if (this.getPokemon(i,j)!==-1) {
-                    if (this.listCanConnect[i][j].length >0) {
-                        return true;
-                    }
-                }
-            }
+        if (this.countRemainingOfListCanConnect > 0) {
+            return true
         }
         return false
+        // for (var i = 0; i < this.getNRows(); i++) {
+        //     for (var j = 0; j < this.getNColumns(); j++) {
+        //         if (this.getPokemon(i,j)!==-1) {
+        //             if (this.listCanConnect[i][j].length >0) {
+        //                 cc.log("true: " + this.countRemainingOfListCanConnect)
+        //                 return true;
+        //             }
+        //         }
+        //     }
+        // }
+        // cc.log("false: " + this.countRemainingOfListCanConnect)
+        // return false
     },
 
     findPath: function (preX, preY, x , y) {
