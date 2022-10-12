@@ -42,6 +42,7 @@ var BoardView = cc.Layer.extend({
         pokemon.setScaleY(this.squareSize / pokemon.getContentSize().height);
         var position = this.positionOf(row, column)
         pokemon.setPosition(position);
+        pokemon.positonInBoard = cc.p(row, column)
         var self = this
         var listener = cc.EventListener.create({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
@@ -50,7 +51,7 @@ var BoardView = cc.Layer.extend({
                 var touchLocation = cc.p(touch.getLocation().x - self.squareSize, touch.getLocation().y - (cc.Director.getInstance().getVisibleSize().height-self._height)/2)
                 var target = event.getCurrentTarget() //target: pokemon
                 if (cc.rectContainsPoint(target.getBoundingBox(), touchLocation)) {
-                    var p = self.findRowAndColumnOfSprite(target)
+                    var p = target.positonInBoard
                     self.removeChoosePokemonEffect();
                     if (self.board.selectPokemon(p.x, p.y)){
                         self.connectPokemons(self.board.getPreviousX(), self.board.getPreviousY(),p.x,p.y)
@@ -92,17 +93,6 @@ var BoardView = cc.Layer.extend({
 
     positionOf: function (row, column){
         return cc.p(column * this.squareSize + this.squareSize/2, this._height - row *this.squareSize -this.squareSize/2);
-    },
-
-    findRowAndColumnOfSprite: function (node) {
-        for (var i = 0; i < this.board.getNRows(); i++) {
-            for (var j = 0; j < this.board.getNColumns(); j++) {
-                if (this.pokemonImageTable[i][j] == node) {
-                    return cc.p(i,j)
-                }
-            }
-        }
-        return cc.p(-1, -1)
     },
 
     createChoosePokemonEffectByParticle: function (pokemon) {
@@ -288,6 +278,7 @@ var BoardView = cc.Layer.extend({
             for (var j=0; j<this.board.getNColumns(); j++){
                 if (afterPosition[i][j].x != -1 ) {
                     this.pokemonImageTable[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemonImageTable[i][j]
+                    this.pokemonImageTable[i][j].positonInBoard = cc.p(afterPosition[i][j].x, afterPosition[i][j].y)
                     var moveUp = cc.moveTo(MW.DURATION_MOVE_POKEMONS, this.positionOf(afterPosition[i][j].x,afterPosition[i][j].y))
                     this.pokemonImageTable[i][j].runAction(moveUp)
                 }
