@@ -3,7 +3,7 @@ var BoardView = cc.Layer.extend({
     // squareSize: Độ dài cạnh 1 ô vuông trong bàn chơi (pixel)
     // _width: Độ rộng của board view
     // _height: Độ dài của board view
-    // pokemons: Bảng row x column sprite của từng pokemon
+    // pokemonImageTable: Bảng row x column sprite của từng pokemon
 
     createBoardView: function (board){
         let boardView = new BoardView();
@@ -11,30 +11,26 @@ var BoardView = cc.Layer.extend({
         boardView.squareSize = 0
         boardView._width = 0
         boardView._height = 0
-        boardView.pokemons = {}
+        boardView.pokemonImageTable = {}
+        boardView.checkExistSolution()
         boardView.showBoard();
         return boardView;
     },
 
     showBoard: function (){
         this.removeAllChildren(true)
-        while (!this.board.checkExistSolution()) {
-            this.board.generateTablePokemons()
-        }
         let visibleSize = cc.Director.getInstance().getVisibleSize();
         this.squareSize = visibleSize.width / (this.board.getNColumns() + 2);
         this._width = this.squareSize * this.board.getNColumns();
         this._height = this.squareSize * this.board.getNRows();
         this.setContentSize(this._width, this._height);
-        this.pokemons = [];
+        this.pokemonImageTable = [];
         for (var i = 0; i < this.board.getNRows(); i++) {
-            this.pokemons[i] = [];
+            this.pokemonImageTable[i] = [];
             for (var j = 0; j < this.board.getNColumns(); j++) {
                 if (this.board.getPokemon(i,j) !== -1) {
-                    this.pokemons[i][j] = this.addPokemon(i,j,this.board.getPokemon(i,j));
-                    // this.pokemons[i][j].i = i;
-                    // this.pokemons[i][j].j = j;
-                    this.addChild(this.pokemons[i][j]);
+                    this.pokemonImageTable[i][j] = this.addPokemon(i,j,this.board.getPokemon(i,j));
+                    this.addChild(this.pokemonImageTable[i][j]);
                 }
             }
         }
@@ -53,11 +49,6 @@ var BoardView = cc.Layer.extend({
             onTouchBegan: function (touch, event) {
                 var touchLocation = cc.p(touch.getLocation().x - self.squareSize, touch.getLocation().y - (cc.Director.getInstance().getVisibleSize().height-self._height)/2)
                 var target = event.getCurrentTarget() //target: pokemon
-
-                // var aa = self.findRowAndColumnOfSprite(target)
-                //
-                // cc.log("Position: "+aa.x + " " + aa.y)
-
                 if (cc.rectContainsPoint(target.getBoundingBox(), touchLocation)) {
                     var p = self.findRowAndColumnOfSprite(target)
                     self.removeChoosePokemonEffect();
@@ -68,7 +59,7 @@ var BoardView = cc.Layer.extend({
                         self.soundRemovePokemonEffect()
                     } else {
                         self.soundChoosePokemonEffect()
-                        self.createChoosePokemonEffect(self.pokemons[p.x][p.y])
+                        self.createChoosePokemonEffect(self.pokemonImageTable[p.x][p.y])
                         self.board.setPreviousX(p.x)
                         self.board.setPreviousY(p.y)
                     }
@@ -106,7 +97,7 @@ var BoardView = cc.Layer.extend({
     findRowAndColumnOfSprite: function (node) {
         for (var i = 0; i < this.board.getNRows(); i++) {
             for (var j = 0; j < this.board.getNColumns(); j++) {
-                if (this.pokemons[i][j] == node) {
+                if (this.pokemonImageTable[i][j] == node) {
                     return cc.p(i,j)
                 }
             }
@@ -120,10 +111,10 @@ var BoardView = cc.Layer.extend({
         emitter.setPosition(square.x, square.y)
         emitter.setScale(0.2)
         // Tao hieu ung particle chay quanh pokemon
-        var moveUp = cc.moveBy(0.2, cc.p(0, this.squareSize))
-        var moveRight = cc.moveBy(0.2, cc.p(this.squareSize, 0))
-        var moveDown = cc.moveBy(0.2, cc.p(0, -this.squareSize))
-        var moveLeft = cc.moveBy(0.2, cc.p(-this.squareSize, 0))
+        var moveUp = cc.moveBy(MW.DURATION_MOVE_POKEMONS, cc.p(0, this.squareSize))
+        var moveRight = cc.moveBy(MW.DURATION_MOVE_POKEMONS, cc.p(this.squareSize, 0))
+        var moveDown = cc.moveBy(MW.DURATION_MOVE_POKEMONS, cc.p(0, -this.squareSize))
+        var moveLeft = cc.moveBy(MW.DURATION_MOVE_POKEMONS, cc.p(-this.squareSize, 0))
         var sequence = cc.sequence(moveUp, moveRight, moveDown, moveLeft).repeatForever()
         emitter.runAction(sequence);
         // Chay hieu ung
@@ -154,11 +145,9 @@ var BoardView = cc.Layer.extend({
     },
 
     removePokemon: function (p){
-        if (this.pokemons[p.x][p.y] == null) return false;
+        if (this.pokemonImageTable[p.x][p.y] == null) return false;
         this.board.removePokemon(p.x, p.y);
-        //cc.eventManager.removeListener(this.pokemons[p.x][p.y].listener)
-        this.removeChild(this.pokemons[p.x][p.y])
-        //this.pokemons[p.x][p.y] = null;
+        this.removeChild(this.pokemonImageTable[p.x][p.y])
         return true;
     },
 
@@ -166,37 +155,49 @@ var BoardView = cc.Layer.extend({
         //1: Hieu ung noi 2 pokemon
         var connectEffect = this.getConnectEffect(x,y,_x,_y)
         //2: Hieu ung lam mo 2 pokemon
-        var pokemonFade1 = cc.TargetedAction.create(this.pokemons[x][y], cc.FadeOut.create(0.3))
-        var pokemonFade2 = cc.TargetedAction.create(this.pokemons[_x][_y], cc.FadeOut.create(0.3))
-        var pokemonScale1 = cc.TargetedAction.create(this.pokemons[x][y], cc.ScaleTo.create(0.3,0.0))
-        var pokemonScale2 = cc.TargetedAction.create(this.pokemons[_x][_y], cc.ScaleTo.create(0.3,0.0))
+        var pokemonFade1 = cc.TargetedAction.create(this.pokemonImageTable[x][y], cc.FadeOut.create(MW.DURATION_CONNECT_POKEMONS))
+        var pokemonFade2 = cc.TargetedAction.create(this.pokemonImageTable[_x][_y], cc.FadeOut.create(MW.DURATION_CONNECT_POKEMONS))
+        var pokemonScale1 = cc.TargetedAction.create(this.pokemonImageTable[x][y], cc.ScaleTo.create(MW.DURATION_CONNECT_POKEMONS,0.0))
+        var pokemonScale2 = cc.TargetedAction.create(this.pokemonImageTable[_x][_y], cc.ScaleTo.create(MW.DURATION_CONNECT_POKEMONS,0.0))
         var effectSpawn = cc.spawn(pokemonFade1, pokemonScale1,pokemonFade2,pokemonScale2)
         //3: Xoa 2 pokemon
         var removePokemon = cc.callFunc(function (target){
             this.removePokemon(cc.p(x,y));
             this.removePokemon(cc.p(_x,_y));
         }.bind(this))
-
         //4: Check con nuoc di tiep khong
-        var checkSolution = cc.callFunc(this.checkExistSolution, this)
-
-        //5: Board run
-        var boardUp = null
-        if (MW.BOARD_RUN == 1){
-            boardUp = cc.callFunc(function (targer) {
+        var checkSolution = cc.callFunc(function (target){
+            this.checkExistSolution();
+        }.bind(this))
+        //5: Board run and Sequence
+        var sequence
+        if (MW.POKEMON_MOVE != 0) {
+            var boardUp = cc.callFunc(function (targer) {
                 this.boardUp(x,y,_x,_y);
             }.bind(this))
+            sequence = cc.sequence(connectEffect, effectSpawn, removePokemon,boardUp,checkSolution)
+        } else {
+            sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, checkSolution)
         }
 
-        // Sequence (1,2,3,4,5)
-        var sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, checkSolution,boardUp)
         this.runAction(sequence)
     },
 
-    checkExistSolution: function (target){
-        if (!target.board.checkExistSolution()) {
-            target.board.generateTablePokemons()
-            target.showBoard()
+    checkExistSolution: function (){
+        var flag = false
+        if (MW.POKEMON_MOVE != 0) {
+            while (!this.board.checkExistSolutionMovableInBoard()) {
+                this.board.generateTablePokemons()
+                flag = true
+            }
+        } else{
+            while (!this.board.checkExistSolutionUnmovableInBoard()) {
+                this.board.generateTablePokemons()
+                flag = true
+            }
+        }
+        if (flag) {
+            this.showBoard()
         }
     },
 
@@ -215,31 +216,35 @@ var BoardView = cc.Layer.extend({
         return cc.targetedAction(emitter, cc.sequence(actions))
     },
 
-    traceIndex: function (){
-        let line = '';
-        for (var i = 0; i < this.board.getNRows(); i++) {
-            for (var j = 0; j < this.board.getNColumns(); j++) {
-                if(this.pokemons[i][j]){
-                    this.pokemons[i][j] = -1;
-                    line += this.pokemons[i][j].i + ',' + this.pokemons[i][j].j + ' - ';
-                }
-                else line += '-----'
-            }
-            cc.log(line);
-            line = '';
-        }
-    },
+    // traceIndex: function (){
+    //     let line = '';
+    //     for (var i = 0; i < this.board.getNRows(); i++) {
+    //         for (var j = 0; j < this.board.getNColumns(); j++) {
+    //             if(this.pokemonImageTable[i][j]){
+    //                 this.pokemonImageTable[i][j] = -1;
+    //                 line += this.pokemonImageTable[i][j].i + ',' + this.pokemonImageTable[i][j].j + ' - ';
+    //             }
+    //             else line += '-----'
+    //         }
+    //         cc.log(line);
+    //         line = '';
+    //     }
+    // },
 
     showHint: function (){
         this.removeChoosePokemonEffect()
-        for (var i = 0; i < this.board.getNRows(); i++) {
-            for (var j = 0; j < this.board.getNColumns(); j++) {
-                if (this.board.getPokemon(i, j) !== -1) {
-                    if (this.board.listCanConnect[i][j].length > 0) {
-                        var p = this.board.listCanConnect[i][j][0]
-                        this.createChoosePokemonEffect(this.pokemons[i][j])
-                        this.createChoosePokemonEffect(this.pokemons[p.x][p.y])
-                        return
+        if (MW.POKEMON_MOVE != 0) {
+
+        } else{
+            for (var i = 0; i < this.board.getNRows(); i++) {
+                for (var j = 0; j < this.board.getNColumns(); j++) {
+                    if (this.board.getPokemon(i, j) !== -1) {
+                        if (this.board.listCanConnect[i][j].length > 0) {
+                            var p = this.board.listCanConnect[i][j][0]
+                            this.createChoosePokemonEffect(this.pokemonImageTable[i][j])
+                            this.createChoosePokemonEffect(this.pokemonImageTable[p.x][p.y])
+                            return
+                        }
                     }
                 }
             }
@@ -269,8 +274,6 @@ var BoardView = cc.Layer.extend({
                 if (p!=-1){
                     tmpPokemon[run][column[i]] = -1
                     tmpPokemon[++current][column[i]] = p
-                    // tmpPokemon[current][column[i]].i = current;
-                    // tmpPokemon[current][column[i]].j = column[i];
                     afterPosition[run][column[i]] = cc.p(current,column[i])
                 }
                 run++
@@ -278,21 +281,17 @@ var BoardView = cc.Layer.extend({
         }
         this.moveUp(afterPosition)
         this.board.boardUpdatePosition(tmpPokemon)
-
-        //this.traceIndex()
     },
 
     moveUp: function (afterPosition){
         for (var i=0; i<this.board.getNRows(); i++){
             for (var j=0; j<this.board.getNColumns(); j++){
                 if (afterPosition[i][j].x != -1 ) {
-                    //cc.log(i + " " +j)
-                    this.pokemons[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemons[i][j]
-                    var moveUp = cc.moveTo(0.2, this.positionOf(afterPosition[i][j].x,afterPosition[i][j].y))
-                    this.pokemons[i][j].runAction(moveUp)
+                    this.pokemonImageTable[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemonImageTable[i][j]
+                    var moveUp = cc.moveTo(MW.DURATION_MOVE_POKEMONS, this.positionOf(afterPosition[i][j].x,afterPosition[i][j].y))
+                    this.pokemonImageTable[i][j].runAction(moveUp)
                 }
             }
         }
-        //this.traceIndex();
     }
 })

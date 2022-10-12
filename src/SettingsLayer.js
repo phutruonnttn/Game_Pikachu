@@ -5,10 +5,10 @@ var SettingsLayer = cc.Layer.extend({
         this.init();
     },
     init:function () {
-        var sp = new cc.Sprite(res.loading_png);
-        sp.setScale(0.6)
-        sp.setPosition(250,400)
-        this.addChild(sp, 0, 1);
+        // var sp = new cc.Sprite(res.loading_png);
+        // sp.setScale(0.6)
+        // sp.setPosition(250,400)
+        // this.addChild(sp, 0, 1);
 
         var cacheImage = cc.textureCache.addImage(res.menuTitle_png);
         var title = new cc.Sprite(cacheImage, cc.rect(0, 0, 134, 39));
@@ -28,7 +28,7 @@ var SettingsLayer = cc.Layer.extend({
         var item1 = new cc.MenuItemToggle(
             new cc.MenuItemFont("On"),new cc.MenuItemFont("Off"));
         item1.setCallback(this.onSoundControl );
-        item1.setColor(cc.color(MW.FONTCOLOR));
+        item1.setColor(cc.color(MW.WHITE_COLOR));
         var state = MW.SOUND ? 0 : 1;
         item1.setSelectedIndex(state);
 
@@ -40,14 +40,32 @@ var SettingsLayer = cc.Layer.extend({
 
         cc.MenuItemFont.setFontName("Arial");
         cc.MenuItemFont.setFontSize(26);
-
         var item2 = new cc.MenuItemToggle(
             new cc.MenuItemFont("Easy"),
             new cc.MenuItemFont("Normal"),
             new cc.MenuItemFont("Hard"));
-        item2.setColor(cc.color(MW.FONTCOLOR));
+        item2.setColor(cc.color(MW.WHITE_COLOR));
         item2.setSelectedIndex(MW.CURRENT_MODE)
-        item2.setCallback( this.onModeControl );
+        item2.setCallback(this.onModeControl);
+
+
+        cc.MenuItemFont.setFontName("Arial");
+        cc.MenuItemFont.setFontSize(18);
+        var title3 = new cc.MenuItemFont("Movable");
+        title3.setEnabled(false);
+        title3.setColor(cc.color(MW.FONTCOLOR));
+
+        cc.MenuItemFont.setFontName("Arial");
+        cc.MenuItemFont.setFontSize(26);
+        var item3 = new cc.MenuItemToggle(
+            new cc.MenuItemFont("None"),
+            new cc.MenuItemFont("Up"),
+            new cc.MenuItemFont("Down"),
+            new cc.MenuItemFont("Right"),
+            new cc.MenuItemFont("Left"));
+        item3.setColor(cc.color(MW.WHITE_COLOR));
+        item3.setSelectedIndex(MW.POKEMON_MOVE)
+        item3.setCallback(this.onMovableControl);
 
 
         cc.MenuItemFont.setFontName("Arial");
@@ -57,8 +75,8 @@ var SettingsLayer = cc.Layer.extend({
         var back = new cc.MenuItemLabel(label, this.onBackCallback);
         back.scale = 0.8;
 
-        var menu = new cc.Menu(title1, title2, item1, item2, back);
-        menu.alignItemsInColumns(2, 2, 1);
+        var menu = new cc.Menu(title1, title2, title3, item1, item2, item3, back);
+        menu.alignItemsInColumns(3, 3, 1);
         this.addChild(menu);
 
         back.y -= 50;
@@ -100,5 +118,8 @@ var SettingsLayer = cc.Layer.extend({
             MW.NTYPES = MW.NTYPES_HARD
             MW.N_EACH_OF_TYPE = MW.N_EACH_OF_TYPE_HARD
         }
+    },
+    onMovableControl: function (){
+        MW.POKEMON_MOVE = this.getSelectedIndex()
     }
 });

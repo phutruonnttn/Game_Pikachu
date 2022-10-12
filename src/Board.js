@@ -1,7 +1,7 @@
 let Board = cc.Class.extend( {
     // n_rows: Số hàng của bảng chứa type từng pokemon
     // n_columns: Số cột của bảng chứa type từng pokemon
-    // _pokemons: Bảng row x column type của từng pokemon
+    // pokemonTypeTable: Bảng row x column type của từng pokemon
     // previousX: Tọa độ x của pokemon đang được chọn
     // previousY: Tọa độ y của pokemon đang được chọn
     // countType: Số lượng pokemon còn lại của mỗi type
@@ -17,15 +17,15 @@ let Board = cc.Class.extend( {
         this.types = n_types
         this.previousX = -1
         this.previousY = -1
-        this._pokemons = {}
+        this.pokemonTypeTable = {}
         this.typePositions = {}
         this.countRemainingPokemon = n_rows * n_column
         this.listCanConnect = {}
         for (var i = 0; i < n_rows; i++){
-            this._pokemons[i] = [];
+            this.pokemonTypeTable[i] = [];
             this.listCanConnect[i] = []
             for (var j = 0; j < n_column; j++){
-                this._pokemons[i][j] = -2;
+                this.pokemonTypeTable[i][j] = MW.FLAG_NUMBER;
                 this.listCanConnect[i][j] = []
             }
         }
@@ -43,23 +43,27 @@ let Board = cc.Class.extend( {
         }
         for (var i = 0; i < this.getNRows(); i++) {
             for (var j = 0; j < this.getNColumns(); j++) {
-                e[i+1][j+1] = (this._pokemons[i][j] !== -1)
+                e[i+1][j+1] = (this.pokemonTypeTable[i][j] !== -1)
             }
         }
         return e
     },
 
+    //Co the toi uu: bfs xong moi for type
     generateListCanConnect: function (){
         var e = this.initTableForBFS()
         for (var i = 0; i < this.n_rows; i++){
             for (var j = 0; j < this.n_columns; j++){
                 if (this.getPokemon(i,j) !== -1) {
-                    for (var k = 0; k<this.typePositions[this.getPokemon(i,j)-1].length; k++){
+                    var stepCount = this.breadthFirstSearch(cc.p(-1,-1),cc.p(i+1,j+1),e,false)
+                    for (var k = 0; k<this.typePositions[this.getPokemon(i,j)-1].length; k++) {
                         var p = this.typePositions[this.getPokemon(i,j)-1][k]
                         if (this.getPokemon(p.x, p.y) != -1){
                             if (p.x!==i || p.y !== j) {
-                                var stepCount = this.breadthFirstSearch(cc.p(p.x+1,p.y+1),cc.p(i+1,j+1),e,false)
-                                if (1<=stepCount[p.x+1][p.y+1] && stepCount[p.x+1][p.y+1]<=3){
+                                var pInBFS = cc.p(p.x+1,p.y+1)
+                                var stepTo = Math.min(stepCount[pInBFS.x][pInBFS.y],stepCount[pInBFS.x-1][pInBFS.y]+1,
+                                    stepCount[pInBFS.x][pInBFS.y-1]+1,stepCount[pInBFS.x+1][pInBFS.y]+1,stepCount[pInBFS.x][pInBFS.y+1]+1)
+                                if (MW.MIN_STEP_COUNT<=stepTo && stepTo<=MW.MAX_STEP_COUNT) {
                                     this.listCanConnect[i][j].push(p)
                                 }
                             }
@@ -79,10 +83,10 @@ let Board = cc.Class.extend( {
         }
         for (var i = 0; i < this.n_rows; i++) {
             for (var j = 0; j < this.n_columns; j++) {
-                if (this._pokemons[i][j] !== -1) {
+                if (this.pokemonTypeTable[i][j] !== -1) {
                     var type;
                     do {
-                        type = Math.floor(Math.random() * 100) % this.types;
+                        type = Math.floor(Math.random() * this.types) % this.types;
                     } while (countType[type] >= this.countType[type]);
                     countType[type]++;
                     this.typePositions[type].push(cc.p(i,j))
@@ -101,9 +105,9 @@ let Board = cc.Class.extend( {
     },
 
     removePokemon: function (x,y){
-        this.countType[this._pokemons[x][y]-1]--
+        this.countType[this.pokemonTypeTable[x][y]-1]--
         this.countRemainingPokemon--
-        this._pokemons[x][y] = -1
+        this.pokemonTypeTable[x][y] = -1
         //Cap nhat lai mang listCanConnect
         for (var i = 0; i< this.listCanConnect[x][y].length; i++){
             var p = this.listCanConnect[x][y][i]
@@ -124,7 +128,7 @@ let Board = cc.Class.extend( {
         if (this.previousX === -1 && this.previousY === -1) {
             return false;
         }
-        if (this._pokemons[x][y] !== this._pokemons[this.previousX][this.previousY]) {
+        if (this.pokemonTypeTable[x][y] !== this.pokemonTypeTable[this.previousX][this.previousY]) {
             return false;
         }
         if (!this.canConnect(this.previousX, this.previousY, x, y)) {
@@ -138,28 +142,25 @@ let Board = cc.Class.extend( {
 
     canConnect: function (preX, preY, x , y) {
         var path = this.findPath(preX, preY, x, y)
-        return path.length >= 2 && path.length <= 4
+        return path.length >= MW.MIN_PATH_LENGTH && path.length <= MW.MAX_PATH_LENGTH
     },
 
-    checkExistSolution2: function () {
+    checkExistSolutionMovableInBoard: function () {
         if (this.countRemainingPokemon === 0) return true
         var e = this.initTableForBFS()
         for (var i = 0; i < this.getNRows(); i++) {
             for (var j = 0; j < this.getNColumns(); j++){
                 if (this.getPokemon(i,j) !== -1) {
-                    for (var k = 0; k < this.typePositions[this.getPokemon(i,j)-1].length; k++) {
-                        var t = this.typePositions[this.getPokemon(i,j)-1][k]
-                        var s = cc.p(i+1, j+1)
-                        if (s.x === t.x+1 && s.y === t.y+1) continue
-                        var trace = this.breadthFirstSearch(s,cc.p(t.x+1,t.y+1),e, true)
-                        var countP = 0
-                        if (trace[s.x][s.y].x !== -1) {
-                            while (s.x !== -2) {
-                                countP++
-                                s = trace[s.x][s.y]
+                    var stepCount = this.breadthFirstSearch(cc.p(-1,-1),cc.p(i+1,j+1),e, false)
+                    for (var i2 = 0; i2 < this.getNRows(); i2++) {
+                        for (var j2 = 0; j2 < this.getNColumns(); j2++) {
+                            if (this.getPokemon(i2,j2) == this.getPokemon(i,j) && (i!=i2 || j!=j2)) {
+                                var p = cc.p(i2+1,j2+1)
+                                var stepTo = Math.min(stepCount[p.x][p.y],stepCount[p.x-1][p.y]+1,stepCount[p.x][p.y-1]+1,
+                                    stepCount[p.x+1][p.y]+1,stepCount[p.x][p.y+1]+1)
+                                if (MW.MIN_STEP_COUNT<=stepTo && stepTo<=MW.MAX_STEP_COUNT) return true
                             }
                         }
-                        if (countP >= 2 && countP <= 4) return true;
                     }
                 }
             }
@@ -167,7 +168,7 @@ let Board = cc.Class.extend( {
         return false
     },
 
-    checkExistSolution: function (){
+    checkExistSolutionUnmovableInBoard: function (){
         if (this.countRemainingPokemon === 0) return true
         var check = this.checkListCanConnect()
         if (check) {
@@ -201,7 +202,7 @@ let Board = cc.Class.extend( {
         //trace back
         var res = []
         if (trace[s.x][s.y].x !== -1) {
-            while (s.x !== -2) {
+            while (s.x !== MW.FLAG_NUMBER) {
                 res.push(cc.p(s.x-1, s.y-1))
                 s = trace[s.x][s.y]
             }
@@ -211,7 +212,6 @@ let Board = cc.Class.extend( {
 
     breadthFirstSearch: function (s,t,e,typeReturn) {
         var trace = []
-        var maxStepCount = 3
         var stepCount = []
         for (var i = 0; i < this.getNRows()+2; i++) {
             trace[i] = []; stepCount[i] = [];
@@ -224,8 +224,10 @@ let Board = cc.Class.extend( {
         var dy = [0, 1, 0, -1]
         var q = new Queue();
         q.enqueue(t)
-        trace[t.x][t.y] = cc.p(-2,-2)
-        e[s.x][s.y] = 0;
+        trace[t.x][t.y] = cc.p(MW.FLAG_NUMBER,MW.FLAG_NUMBER)
+        if (s.x!=-1){
+            e[s.x][s.y] = 0;
+        }
         e[t.x][t.y] = 0;
         while (!q.isEmpty()) {
             var u = q.dequeue();
@@ -234,7 +236,7 @@ let Board = cc.Class.extend( {
                 var x = u.x + dx[i];
                 var y = u.y + dy[i];
                 while (x >= 0 && x < this.getNRows()+2 && y>=0 && y < this.getNColumns()+2 && e[x][y] == 0) {
-                    if (trace[x][y].x === -1 && stepCount[u.x][u.y]+1 <= maxStepCount) {
+                    if (trace[x][y].x === -1 && stepCount[u.x][u.y]+1 <= MW.MAX_STEP_COUNT) {
                         stepCount[x][y] = stepCount[u.x][u.y]+1
                         trace[x][y] = u;
                         q.enqueue(cc.p(x, y))
@@ -243,8 +245,17 @@ let Board = cc.Class.extend( {
                 }
             }
         }
-        e[s.x][s.y] = 1;
+        if (s.x!=-1){
+            e[s.x][s.y] = 1;
+        }
         e[t.x][t.y] = 1;
+        for (var i = 0; i < this.getNRows()+2; i++) {
+            for (var j = 0; j < this.getNColumns()+2; j++) {
+                if(stepCount[i][j] == 0) {
+                    stepCount[i][j] = MW.BIG_NUMBER
+                }
+            }
+        }
         if (typeReturn) return trace
         return stepCount
     },
@@ -274,10 +285,10 @@ let Board = cc.Class.extend( {
     },
 
     addPokemon: function (x,y,type){
-        this._pokemons[x][y] = type;
+        this.pokemonTypeTable[x][y] = type;
     },
 
     getPokemon: function (x,y){
-        return this._pokemons[x][y];
+        return this.pokemonTypeTable[x][y];
     }
 })
