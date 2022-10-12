@@ -51,7 +51,7 @@ let Board = cc.Class.extend( {
         return e
     },
 
-    //Co the toi uu: bfs xong moi for type
+    //Co the toi uu: bfs xong moi for type - nhung khong cai thien nhieu, van O(n^4)
     generateListCanConnect: function (){
         this.countRemainingOfListCanConnect = 0
         var e = this.initTableForBFS()
@@ -200,18 +200,6 @@ let Board = cc.Class.extend( {
             return true
         }
         return false
-        // for (var i = 0; i < this.getNRows(); i++) {
-        //     for (var j = 0; j < this.getNColumns(); j++) {
-        //         if (this.getPokemon(i,j)!==-1) {
-        //             if (this.listCanConnect[i][j].length >0) {
-        //                 cc.log("true: " + this.countRemainingOfListCanConnect)
-        //                 return true;
-        //             }
-        //         }
-        //     }
-        // }
-        // cc.log("false: " + this.countRemainingOfListCanConnect)
-        // return false
     },
 
     findPath: function (preX, preY, x , y) {
@@ -280,6 +268,33 @@ let Board = cc.Class.extend( {
         }
         if (typeReturn) return trace
         return stepCount
+    },
+
+    boardUp: function (x,y,_x,_y){
+        var afterPosition = {}
+        for (var i=0; i<this.getNRows(); i++){
+            afterPosition[i] = []
+            for (var j=0; j<this.getNColumns(); j++){
+                afterPosition[i][j] = cc.p(-1,-1)
+            }
+        }
+        var column = [y,_y]
+        if (y==_y) column.pop()
+        var row = [x, _x]
+        for (var i = 0; i< column.length; i++){
+            var current = -1
+            var run = 0
+            while (run<this.getNRows()){
+                var p = this.pokemonTypeTable[run][column[i]]
+                if (p!=-1){
+                    this.pokemonTypeTable[run][column[i]] = -1
+                    this.pokemonTypeTable[++current][column[i]] = p
+                    afterPosition[run][column[i]] = cc.p(current,column[i])
+                }
+                run++
+            }
+        }
+        return afterPosition
     },
 
     getPreviousX: function (){

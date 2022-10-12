@@ -162,10 +162,10 @@ var BoardView = cc.Layer.extend({
         //5: Board run and Sequence
         var sequence
         if (MW.POKEMON_MOVE != 0) {
-            var boardUp = cc.callFunc(function (targer) {
-                this.boardUp(x,y,_x,_y);
+            var moveUp = cc.callFunc(function (targer) {
+                this.moveUp(x,y,_x,_y);
             }.bind(this))
-            sequence = cc.sequence(connectEffect, effectSpawn, removePokemon,boardUp,checkSolution)
+            sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, moveUp,checkSolution)
         } else {
             sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, checkSolution)
         }
@@ -241,39 +241,8 @@ var BoardView = cc.Layer.extend({
         }
     },
 
-    //Goi ham sau khi da remove 2 o (x,y) va (_x,_y)
-    boardUp: function (x,y,_x,_y){
-        var tmpPokemon = {}
-        var afterPosition = {}
-        for (var i=0; i<this.board.getNRows(); i++){
-            tmpPokemon[i] = []
-            afterPosition[i] = []
-            for (var j=0; j<this.board.getNColumns(); j++){
-                tmpPokemon[i][j] = this.board.getPokemon(i,j)
-                afterPosition[i][j] = cc.p(-1,-1)
-            }
-        }
-        var column = [y,_y]
-        if (y==_y) column.pop()
-        var row = [x, _x]
-        for (var i = 0; i< column.length; i++){
-            var current = -1
-            var run = 0
-            while (run<this.board.getNRows()){
-                var p = tmpPokemon[run][column[i]]
-                if (p!=-1){
-                    tmpPokemon[run][column[i]] = -1
-                    tmpPokemon[++current][column[i]] = p
-                    afterPosition[run][column[i]] = cc.p(current,column[i])
-                }
-                run++
-            }
-        }
-        this.moveUp(afterPosition)
-        this.board.boardUpdatePosition(tmpPokemon)
-    },
-
-    moveUp: function (afterPosition){
+    moveUp: function (x,y,_x,_y){
+        var afterPosition = this.board.boardUp(x,y,_x,_y)
         for (var i=0; i<this.board.getNRows(); i++){
             for (var j=0; j<this.board.getNColumns(); j++){
                 if (afterPosition[i][j].x != -1 ) {
