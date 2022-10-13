@@ -4,17 +4,32 @@ var MW = MW || {};
 MW.NROWS = 8;
 MW.NCOLUMNS = 8;
 // Max 32
-MW.NTYPES = 32;
+MW.NTYPES = 8;
 // MW.NROWS * MW.NCOLUMNS = MW.NTYPES * MW.N_EACH_OF_TYPE
-MW.N_EACH_OF_TYPE = 2;
+MW.N_EACH_OF_TYPE = 8;
 
 // Pokemon move
 MW.POKEMON_MOVE = 0
+MW.MOVE_PARAMS = [
+    {"name": "None"},//dont move
+    {"name": "Up","splitDirection": 1, "direction": [0]},//move up
+    {"name": "Down","splitDirection": 1, "direction": [1]},//move down
+    {"name": "Right","splitDirection": 0, "direction": [1]},//move right
+    {"name": "Left","splitDirection": 0, "direction": [0]},//move left
+    {"name": "Split top, bottom","splitDirection": 1, "direction": [0,1]},//split up and down
+    {"name": "Split right, left","splitDirection": 0, "direction": [0,1]},//split right and left
+    {"name": "Converge top, bottom","splitDirection": 1, "direction": [1,0]},//converge from top and bottom
+    {"name": "Converge right, left","splitDirection": 0, "direction": [1,0]},//converge from right and left
+]
 MW.DONT_MOVE = 0
 MW.MOVE_UP = 1
 MW.MOVE_DOWN = 2
 MW.MOVE_RIGHT = 3
 MW.MOVE_LEFT = 4
+MW.SPLIT_UP__DOWN = 5
+MW.SPLIT_RIGHT_LEFT = 6
+MW.CONVERGE_TOP_BOTTOM = 7
+MW.CONVERGE_RIGHT_LEFT = 8
 
 MW.BIG_NUMBER = 99999
 MW.FLAG_NUMBER = -2

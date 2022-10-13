@@ -163,7 +163,7 @@ var BoardView = cc.Layer.extend({
         var sequence
         if (MW.POKEMON_MOVE != MW.DONT_MOVE) {
             var moveBoard = cc.callFunc(function (targer) {
-                this.moveBoard(x,y,_x,_y);
+                this.moveBoard(MW.MOVE_PARAMS[MW.POKEMON_MOVE].splitDirection, MW.MOVE_PARAMS[MW.POKEMON_MOVE].direction);
             }.bind(this))
             sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, moveBoard, checkSolution)
         } else {
@@ -235,29 +235,31 @@ var BoardView = cc.Layer.extend({
         this.createChoosePokemonEffect(this.pokemonImageTable[p2.x][p2.y])
     },
 
-    moveBoard: function (x,y,_x,_y){
-        var afterPosition
-        if (MW.POKEMON_MOVE == MW.MOVE_UP) {
-            afterPosition = this.board.boardUp(x,y,_x,_y)
-        } else if (MW.POKEMON_MOVE == MW.MOVE_DOWN){
-            afterPosition = this.board.boardDown(x,y,_x,_y)
-            return//delete after implement code down
-        } else if (MW.POKEMON_MOVE == MW.MOVE_RIGHT){
-            afterPosition = this.board.boardRight(x,y,_x,_y)
-            return//delete after implement code right
-        } else if (MW.POKEMON_MOVE == MW.MOVE_LEFT){
-            afterPosition = this.board.boardLeft(x,y,_x,_y)
-            return//delete after implement code left
-        }
+    moveBoard: function (splitDirection, direction){
+        //var afterPosition = this.board.boardMove(0, [0]) //sang trai het
+        //var afterPosition = this.board.boardMove(0, [1])//sang phai het
+        //var afterPosition = this.board.boardMove(1, [0])//len het
+        //var afterPosition = this.board.boardMove(1,[1]) // xuong duoi
+        //var afterPosition = this.board.boardMove(1,[0,1])//ca len va xuong
+        //var afterPosition = this.board.boardMove(0,[0,1])//ca sang trai va phai
+        //var afterPosition = this.board.boardMove(0,[1,0])//don vao tu 2 ben
+        //var afterPosition = this.board.boardMove(1,[1,0])//don vao tu tren va duoi
+
+        var afterPosition = this.board.boardMove(splitDirection,direction)
+
+        var tmpImageTable = this.pokemonImageTable.map((value) => value.slice())
         for (var i=0; i<this.board.getNRows(); i++){
             for (var j=0; j<this.board.getNColumns(); j++){
                 if (afterPosition[i][j].x != -1 ) {
-                    this.pokemonImageTable[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemonImageTable[i][j]
-                    this.pokemonImageTable[i][j].positonInBoard = cc.p(afterPosition[i][j].x, afterPosition[i][j].y)
+                    //tmpImageTable[i][j].positonInBoard = cc.p(afterPosition[i][j].x, afterPosition[i][j].y)
+                    tmpImageTable[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemonImageTable[i][j]
+                    tmpImageTable[afterPosition[i][j].x][afterPosition[i][j].y].positonInBoard = cc.p(afterPosition[i][j].x, afterPosition[i][j].y)
+
                     var move = cc.moveTo(MW.DURATION_MOVE_POKEMONS, this.positionOf(afterPosition[i][j].x,afterPosition[i][j].y))
                     this.pokemonImageTable[i][j].runAction(move)
                 }
             }
         }
+        this.pokemonImageTable = tmpImageTable.map((value) => value.slice())
     }
 })

@@ -187,14 +187,12 @@ let Board = cc.Class.extend( {
                         for (var j2 = 0; j2 < this.getNColumns(); j2++) {
                             if (this.getPokemon(i2,j2) == this.getPokemon(i,j) && (i!=i2 || j!=j2)) {
                                 if ((i2==i-1 && j2==j) || (i2==i+1 && j2==j) || (i2==i && j2==j-1) || (i2==i && j2==j+1)){
-                                    // return [cc.p(i,j),cc.p(i2,j2)]
                                     return {"first": cc.p(i,j), "second": cc.p(i2,j2)}
                                 }
                                 var p = cc.p(i2+1,j2+1)
                                 var stepTo = Math.min(stepCount[p.x][p.y],stepCount[p.x-1][p.y]+1,stepCount[p.x][p.y-1]+1,
                                     stepCount[p.x+1][p.y]+1,stepCount[p.x][p.y+1]+1)
                                 if (MW.MIN_STEP_COUNT<=stepTo && stepTo<=MW.MAX_STEP_COUNT) {
-                                    //return [cc.p(i,j),cc.p(i2,j2)]
                                     return {"first": cc.p(i,j), "second": cc.p(i2,j2)}
                                 }
                             }
@@ -304,7 +302,7 @@ let Board = cc.Class.extend( {
         return stepCount
     },
 
-    boardUp: function (x,y,_x,_y){
+    initAfterPosition: function (){
         var afterPosition = {}
         for (var i=0; i<this.getNRows(); i++){
             afterPosition[i] = []
@@ -312,36 +310,79 @@ let Board = cc.Class.extend( {
                 afterPosition[i][j] = cc.p(-1,-1)
             }
         }
-        var column = [y,_y]
-        if (y==_y) column.pop()
-        //var row = [x, _x]
-        for (var i = 0; i< column.length; i++){
-            var current = -1
-            var run = 0
-            while (run<this.getNRows()){
-                var p = this.pokemonTypeTable[run][column[i]]
-                if (p!=-1){
-                    this.pokemonTypeTable[run][column[i]] = -1
-                    this.pokemonTypeTable[++current][column[i]] = p
-                    afterPosition[run][column[i]] = cc.p(current,column[i])
+        return afterPosition
+    },
+
+    // splitDirection: hướng cắt chia bảng thành các phần (0 - dọc; 1 - ngang)
+    // direction[]: số lượng phần tử là số phần sau khi chia board, giá trị của
+    //              direction[i] là sẽ hướng sang trái (lên) - 0 hay phải (xuống) - 1
+    //              phụ thuộc vào splitDirection
+    boardMove: function (splitDirection, direction){
+        var afterPosition = this.initAfterPosition()
+        if (splitDirection == 0) {//chia doc
+            for (var i=0; i<direction.length; i++){
+                for (var j = 0; j< this.getNRows(); j++){
+                    if (direction[i] == 0) {//sang trai
+                        var current = this.getNColumns()/direction.length * i - 1
+                        var run = this.getNColumns()/direction.length * i
+                        while (run<this.getNColumns()/direction.length*(i+1)){
+                            var p = this.pokemonTypeTable[j][run]
+                            if (p!=-1){
+                                this.pokemonTypeTable[j][run] = -1
+                                this.pokemonTypeTable[j][++current] = p
+                                afterPosition[j][run] = cc.p(j,current)
+                            }
+                            run++
+                        }
+                    } else {
+                        var current = this.getNColumns()/direction.length*(i+1)
+                        var run =  this.getNColumns()/direction.length*(i+1) - 1
+                        while (run >= this.getNColumns()/direction.length*i){
+                            var p = this.pokemonTypeTable[j][run]
+                            if (p!=-1){
+                                this.pokemonTypeTable[j][run] = -1
+                                this.pokemonTypeTable[j][--current] = p
+                                afterPosition[j][run] = cc.p(j,current)
+                            }
+                            run--
+                        }
+                    }
                 }
-                run++
+            }
+        } else {//chia ngang
+            for (var i=0; i<direction.length; i++){
+                for (var j = 0; j< this.getNColumns(); j++) {
+                    if (direction[i] == 0) {//len tren
+                        var current = this.getNRows() / direction.length * i - 1
+                        var run = this.getNRows() / direction.length * i
+                        while (run < this.getNRows() / direction.length * (i + 1)) {
+                            var p = this.pokemonTypeTable[run][j]
+                            if (p != -1) {
+                                this.pokemonTypeTable[run][j] = -1
+                                this.pokemonTypeTable[++current][j] = p
+                                afterPosition[run][j] = cc.p(current, j)
+                            }
+                            run++
+                        }
+                    } else {//xuong duoi
+                        var current = this.getNRows() / direction.length * (i + 1)
+                        var run = this.getNRows() / direction.length * (i + 1) - 1
+                        while (run >= this.getNRows() / direction.length * i) {
+                            var p = this.pokemonTypeTable[run][j]
+                            if (p != -1) {
+                                this.pokemonTypeTable[run][j] = -1
+                                this.pokemonTypeTable[--current][j] = p
+                                afterPosition[run][j] = cc.p(current, j)
+                            }
+                            run--
+                        }
+                    }
+                }
             }
         }
         return afterPosition
     },
 
-    boardDown: function (){
-        cc.log("down")
-    },
-
-    boardRight: function (){
-        cc.log("right")
-    },
-
-    boardLeft: function (){
-        cc.log("left")
-    },
 
     getPreviousX: function (){
         return this.previousX

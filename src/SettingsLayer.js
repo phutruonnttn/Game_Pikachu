@@ -62,7 +62,17 @@ var SettingsLayer = cc.Layer.extend({
             new cc.MenuItemFont("Up"),
             new cc.MenuItemFont("Down"),
             new cc.MenuItemFont("Right"),
-            new cc.MenuItemFont("Left"));
+            new cc.MenuItemFont("Left"),
+            new cc.MenuItemFont("Split top, bottom"),
+            new cc.MenuItemFont("Split right,left"),
+            new cc.MenuItemFont("Converge top, bottom"),
+            new cc.MenuItemFont("Converge right, left"));
+        // var item3 = new cc.MenuItemToggle()
+        // for (var i = 0; i< MW.MOVE_PARAMS.length; i++){
+        //     cc.MenuItemFont.setFontName("Arial");
+        //     cc.MenuItemFont.setFontSize(26);
+        //     item3.addSubItem(new cc.MenuItemFont(MW.MOVE_PARAMS[i].name))
+        // }
         item3.setColor(cc.color(MW.WHITE_COLOR));
         item3.setSelectedIndex(MW.POKEMON_MOVE)
         item3.setCallback(this.onMovableControl);
@@ -75,8 +85,8 @@ var SettingsLayer = cc.Layer.extend({
         var back = new cc.MenuItemLabel(label, this.onBackCallback);
         back.scale = 0.8;
 
-        var menu = new cc.Menu(title1, title2, title3, item1, item2, item3, back);
-        menu.alignItemsInColumns(3, 3, 1);
+        var menu = new cc.Menu(title1, title2, item1, item2, title3, item3, back);
+        menu.alignItemsInColumns(2, 2, 1, 1, 1);
         this.addChild(menu);
 
         back.y -= 50;
