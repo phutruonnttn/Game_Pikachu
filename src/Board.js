@@ -319,10 +319,10 @@ let Board = cc.Class.extend( {
     //              phụ thuộc vào splitDirection
     boardMove: function (splitDirection, direction){
         var afterPosition = this.initAfterPosition()
-        if (splitDirection == 0) {//chia doc
+        if (splitDirection == 0) {
             for (var i=0; i<direction.length; i++){
                 for (var j = 0; j< this.getNRows(); j++){
-                    if (direction[i] == 0) {//sang trai
+                    if (direction[i] == 0) {
                         var current = this.getNColumns()/direction.length * i - 1
                         var run = this.getNColumns()/direction.length * i
                         while (run<this.getNColumns()/direction.length*(i+1)){
@@ -349,10 +349,10 @@ let Board = cc.Class.extend( {
                     }
                 }
             }
-        } else {//chia ngang
+        } else {
             for (var i=0; i<direction.length; i++){
                 for (var j = 0; j< this.getNColumns(); j++) {
-                    if (direction[i] == 0) {//len tren
+                    if (direction[i] == 0) {
                         var current = this.getNRows() / direction.length * i - 1
                         var run = this.getNRows() / direction.length * i
                         while (run < this.getNRows() / direction.length * (i + 1)) {
@@ -364,7 +364,7 @@ let Board = cc.Class.extend( {
                             }
                             run++
                         }
-                    } else {//xuong duoi
+                    } else {
                         var current = this.getNRows() / direction.length * (i + 1)
                         var run = this.getNRows() / direction.length * (i + 1) - 1
                         while (run >= this.getNRows() / direction.length * i) {

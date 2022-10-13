@@ -159,6 +159,9 @@ var BoardView = cc.Layer.extend({
         var checkSolution = cc.callFunc(function (target){
             this.checkExistSolution();
         }.bind(this))
+        // var checkSolution = cc.callFunc( (target) =>{
+        //     this.checkExistSolution();
+        // })
         //5: Board run and Sequence
         var sequence
         if (MW.POKEMON_MOVE != MW.DONT_MOVE) {
@@ -206,21 +209,6 @@ var BoardView = cc.Layer.extend({
         return cc.targetedAction(emitter, cc.sequence(actions))
     },
 
-    // traceIndex: function (){
-    //     let line = '';
-    //     for (var i = 0; i < this.board.getNRows(); i++) {
-    //         for (var j = 0; j < this.board.getNColumns(); j++) {
-    //             if(this.pokemonImageTable[i][j]){
-    //                 this.pokemonImageTable[i][j] = -1;
-    //                 line += this.pokemonImageTable[i][j].i + ',' + this.pokemonImageTable[i][j].j + ' - ';
-    //             }
-    //             else line += '-----'
-    //         }
-    //         cc.log(line);
-    //         line = '';
-    //     }
-    // },
-
     showHint: function (){
         this.removeChoosePokemonEffect()
         var hint
@@ -236,17 +224,7 @@ var BoardView = cc.Layer.extend({
     },
 
     moveBoard: function (splitDirection, direction){
-        //var afterPosition = this.board.boardMove(0, [0]) //sang trai het
-        //var afterPosition = this.board.boardMove(0, [1])//sang phai het
-        //var afterPosition = this.board.boardMove(1, [0])//len het
-        //var afterPosition = this.board.boardMove(1,[1]) // xuong duoi
-        //var afterPosition = this.board.boardMove(1,[0,1])//ca len va xuong
-        //var afterPosition = this.board.boardMove(0,[0,1])//ca sang trai va phai
-        //var afterPosition = this.board.boardMove(0,[1,0])//don vao tu 2 ben
-        //var afterPosition = this.board.boardMove(1,[1,0])//don vao tu tren va duoi
-
         var afterPosition = this.board.boardMove(splitDirection,direction)
-
         var tmpImageTable = this.pokemonImageTable.map((value) => value.slice())
         for (var i=0; i<this.board.getNRows(); i++){
             for (var j=0; j<this.board.getNColumns(); j++){

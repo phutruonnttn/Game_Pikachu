@@ -9,6 +9,8 @@ var res = {
     buttonEffet_mp3 : 'res/Music/buttonEffet.mp3',
     buttonEffet_ogg : 'res/Music/buttonEffet.ogg',
     buttonEffet_wav : 'res/Music/buttonEffet.wav',
+    gameOver_png : 'res/gameOver.png',
+    gameVictory_png: 'res/gameVictory.png',
     soundChoosePokemonEffect: 'res/Music/choose.mp3',
     soundRemovePokemonEffect: 'res/Music/remove.mp3',
     soundMain: 'res/Music/RiverFlowsInYou.mp3'
@@ -32,4 +34,6 @@ var g_maingame = [
     res.buttonEffet_wav,
     res.buttonEffet_mp3,
     res.buttonEffet_ogg,
+    res.gameOver_png,
+    res.gameVictory_png
 ];

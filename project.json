@@ -9,6 +9,8 @@
     "modules" : ["cocos2d"],
 
     "jsList" : [
+        "src/GameVictory.js",
+        "src/GameOver.js",
         "src/Resource.js",
         "src/GameConfig.js",
         "src/Effect.js",

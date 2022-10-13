@@ -1,5 +1,7 @@
 var MW = MW || {};
 
+MW.TIME = 0
+
 // Show board
 MW.NROWS = 8;
 MW.NCOLUMNS = 8;
@@ -11,15 +13,24 @@ MW.N_EACH_OF_TYPE = 8;
 // Pokemon move
 MW.POKEMON_MOVE = 0
 MW.MOVE_PARAMS = [
-    {"name": "None"},//dont move
-    {"name": "Up","splitDirection": 1, "direction": [0]},//move up
-    {"name": "Down","splitDirection": 1, "direction": [1]},//move down
-    {"name": "Right","splitDirection": 0, "direction": [1]},//move right
-    {"name": "Left","splitDirection": 0, "direction": [0]},//move left
-    {"name": "Split top, bottom","splitDirection": 1, "direction": [0,1]},//split up and down
-    {"name": "Split right, left","splitDirection": 0, "direction": [0,1]},//split right and left
-    {"name": "Converge top, bottom","splitDirection": 1, "direction": [1,0]},//converge from top and bottom
-    {"name": "Converge right, left","splitDirection": 0, "direction": [1,0]},//converge from right and left
+    //dont move
+    {"name": "None"},
+    //move up
+    {"name": "Up","splitDirection": 1, "direction": [0]},
+    //move down
+    {"name": "Down","splitDirection": 1, "direction": [1]},
+    //move right
+    {"name": "Right","splitDirection": 0, "direction": [1]},
+    //move left
+    {"name": "Left","splitDirection": 0, "direction": [0]},
+    //split up and down
+    {"name": "Split top, bottom","splitDirection": 1, "direction": [0,1]},
+    //split right and left
+    {"name": "Split right, left","splitDirection": 0, "direction": [0,1]},
+    //converge from top and bottom
+    {"name": "Converge top, bottom","splitDirection": 1, "direction": [1,0]},
+    //converge from right and left
+    {"name": "Converge right, left","splitDirection": 0, "direction": [1,0]},
 ]
 MW.DONT_MOVE = 0
 MW.MOVE_UP = 1

@@ -37,8 +37,11 @@ var GameLayerPokemon = cc.Layer.extend({
         progressTimer.setPosition(visibleSize.width/2, board.y / 2)
         this.addChild(progressTimer)
         //Chạy đếm ngược từ 100% về 0% trong vòng 60 giây.
-        var to = cc.sequence(cc.progressTo(300, 0), cc.progressTo(0, 100));
-        progressTimer.runAction(to.repeatForever())
+        var gameOver = cc.callFunc(function (){
+            cc.delayTime(0.2),
+            this.onGameOver()
+        }.bind(this))
+        progressTimer.runAction(cc.sequence(cc.progressTo(200, 0), gameOver))
     },
 
     showHintButton: function (){
@@ -59,5 +62,15 @@ var GameLayerPokemon = cc.Layer.extend({
 
     onHint: function () {
         this.boardView.showHint()
+    },
+
+    onGameOver:function () {
+        cc.audioEngine.stopMusic();
+        cc.audioEngine.stopAllEffects();
+        var scene = new cc.Scene();
+        //scene.addChild(new GameOver());
+        scene.addChild(new GameVictory())
+        scene.addChild(new GameControlMenu());
+        cc.director.runScene(new cc.TransitionFade(1.2, scene));
     }
 })
