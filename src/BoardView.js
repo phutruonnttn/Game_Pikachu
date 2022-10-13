@@ -38,7 +38,7 @@ var BoardView = cc.Layer.extend({
     },
 
     addPokemon: function (row, column, type){
-        var pokemon = new cc.Sprite("res/pokemon" + type + ".png");
+        var pokemon = new cc.Sprite(cc.spriteFrameCache.getSpriteFrame(MW.PREFIX_NAME + type + MW.SUFFIX_NAME))
         pokemon.setScaleX(this.squareSize / pokemon.getContentSize().width);
         pokemon.setScaleY(this.squareSize / pokemon.getContentSize().height);
         var position = this.positionOf(row, column)

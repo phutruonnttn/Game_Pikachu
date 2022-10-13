@@ -4,7 +4,6 @@ var res = {
     menu_png : 'res/menu.png',
     logo_png: '/res/logo.png',
     menuTitle_png : 'res/menuTitle.png',
-    textureTransparentPack_plist : 'res/textureTransparentPack.plist',
     progressBar: 'res/ProgressBar.png',
     buttonEffet_mp3 : 'res/Music/buttonEffet.mp3',
     buttonEffet_ogg : 'res/Music/buttonEffet.ogg',
@@ -15,7 +14,13 @@ var res = {
     wallBg_png: 'res/backgroundWall.png',
     soundChoosePokemonEffect: 'res/Music/choose.mp3',
     soundRemovePokemonEffect: 'res/Music/remove.mp3',
-    soundMain: 'res/Music/RiverFlowsInYou.mp3'
+    soundMain: 'res/Music/RiverFlowsInYou.mp3',
+    pokemon0_plist: 'res/pokemon-0.plist',
+    pokemon1_plist: 'res/pokemon-1.plist',
+    pokemon2_plist: 'res/pokemon-2.plist',
+    pokemon3_plist: 'res/pokemon-3.plist',
+    pokemon4_plist: 'res/pokemon-4.plist',
+    pokemon5_plist: 'res/pokemon-5.plist'
 };
 
 var g_mainmenu = [
@@ -24,7 +29,6 @@ var g_mainmenu = [
     res.flare_jpg,
     res.menu_png,
     res.menuTitle_png,
-    res.textureTransparentPack_plist,
     res.progressBar,
     res.soundChoosePokemonEffect,
     res.soundRemovePokemonEffect,
@@ -41,3 +45,10 @@ var g_maingame = [
     res.darkBg_png,
     res.wallBg_png
 ];
+
+cc.spriteFrameCache.addSpriteFrames(res.pokemon0_plist)
+cc.spriteFrameCache.addSpriteFrames(res.pokemon1_plist)
+cc.spriteFrameCache.addSpriteFrames(res.pokemon2_plist)
+cc.spriteFrameCache.addSpriteFrames(res.pokemon3_plist)
+cc.spriteFrameCache.addSpriteFrames(res.pokemon4_plist)
+cc.spriteFrameCache.addSpriteFrames(res.pokemon5_plist)

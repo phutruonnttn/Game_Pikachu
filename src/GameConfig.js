@@ -4,12 +4,12 @@ MW.TIME = 0
 MW.TIME_COUNT_DOWN = 300
 
 // Show board
-MW.NROWS = 2;
-MW.NCOLUMNS = 2;
+MW.NROWS = 8;
+MW.NCOLUMNS = 8;
 // Max 32
-MW.NTYPES = 2;
+MW.NTYPES = 8;
 // MW.NROWS * MW.NCOLUMNS = MW.NTYPES * MW.N_EACH_OF_TYPE
-MW.N_EACH_OF_TYPE = 2;
+MW.N_EACH_OF_TYPE = 8;
 
 // Pokemon move
 MW.POKEMON_MOVE = 0
@@ -98,3 +98,5 @@ MW.FONTCOLOR = "#1f2d96";
 MW.WHITE_COLOR = "FFFFFF";
 MW.menuHeight = 36;
 MW.menuWidth = 123;
+MW.PREFIX_NAME = "pokemon"
+MW.SUFFIX_NAME = ".png"

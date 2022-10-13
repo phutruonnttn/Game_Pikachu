@@ -8,8 +8,6 @@ var SysMenu = cc.Layer.extend({
         this.init();
     },
     init:function () {
-        cc.spriteFrameCache.addSpriteFrames(res.textureTransparentPack_plist);
-
         winSize = cc.director.getWinSize();
 
         this.initBackGround();
