@@ -1,12 +1,13 @@
 var GameLayerPokemon = cc.Layer.extend({
     boardView: {},
+    progressTimer: {},
     ctor:function(){
         this._super();
         this.init();
     },
     init:function () {
-        this.showBoard();
         this.showProgressTimer();
+        this.showBoard();
         this.showHintButton();
         return true;
     },
@@ -16,7 +17,7 @@ var GameLayerPokemon = cc.Layer.extend({
             count.push(MW.N_EACH_OF_TYPE)
         }
         var board = new Board(MW.NROWS, MW.NCOLUMNS, MW.NTYPES, count)
-        this.boardView = new BoardView().createBoardView(board)
+        this.boardView = new BoardView().createBoardView(board, this.progressTimer)
         this.addChild(this.boardView, 1)
         var x = (cc.Director.getInstance().getVisibleSize().width - this.boardView.getContentSize().width) / 2;
         var y = (cc.Director.getInstance().getVisibleSize().height - this.boardView.getContentSize().height) / 2;
@@ -24,24 +25,23 @@ var GameLayerPokemon = cc.Layer.extend({
     },
     showProgressTimer: function (){
         let visibleSize = cc.Director.getInstance().getVisibleSize();
-        let board = this.boardView.getBoundingBox()
-        var progressTimer = new cc.ProgressTimer(new cc.Sprite(res.progressBar));
-        progressTimer.type = cc.ProgressTimer.TYPE_BAR
+        this.progressTimer = new cc.ProgressTimer(new cc.Sprite(res.progressBar));
+        this.progressTimer.type = cc.ProgressTimer.TYPE_BAR
         //Đặt tâm ở điểm giữa trái. Ảnh của progressTimer sẽ thu về phía Midpoint.
-        progressTimer.setMidpoint(cc.p(0.0,0.5))
+        this.progressTimer.setMidpoint(cc.p(0.0,0.5))
         //Đặt tỷ lệ thay đổi của 2 chiều ngang, dọc.
-        progressTimer.setBarChangeRate(cc.p(1.0,0.0))
+        this.progressTimer.setBarChangeRate(cc.p(1.0,0.0))
         //Đặt ban đầu 100%
-        progressTimer.setPercentage(100)
-        progressTimer.setScale(visibleSize.width/progressTimer.getContentSize().width)
-        progressTimer.setPosition(visibleSize.width/2, board.y / 2)
-        this.addChild(progressTimer)
+        this.progressTimer.setPercentage(100)
+        this.progressTimer.setScale(visibleSize.width/this.progressTimer.getContentSize().width)
+        this.progressTimer.setPosition(visibleSize.width/2, 100)
+        this.addChild(this.progressTimer)
         //Chạy đếm ngược từ 100% về 0% trong vòng 60 giây.
         var gameOver = cc.callFunc(function (){
             cc.delayTime(0.2),
             this.onGameOver()
         }.bind(this))
-        progressTimer.runAction(cc.sequence(cc.progressTo(200, 0), gameOver))
+        this.progressTimer.runAction(cc.sequence(cc.progressTo(MW.TIME_COUNT_DOWN, 0), gameOver))
     },
 
     showHintButton: function (){
@@ -68,8 +68,8 @@ var GameLayerPokemon = cc.Layer.extend({
         cc.audioEngine.stopMusic();
         cc.audioEngine.stopAllEffects();
         var scene = new cc.Scene();
-        //scene.addChild(new GameOver());
-        scene.addChild(new GameVictory())
+        scene.addChild(new GameOver());
+        //scene.addChild(new GameVictory())
         scene.addChild(new GameControlMenu());
         cc.director.runScene(new cc.TransitionFade(1.2, scene));
     }

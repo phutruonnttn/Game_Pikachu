@@ -8,21 +8,15 @@ var GameVictory = cc.Layer.extend({
         this.init();
     },
     init:function () {
-        // var sp = new cc.Sprite(res.loading_png);
-        // sp.anchorX = 0;
-        // sp.anchorY = 0;
-        // sp.scale = MW.SCALE;
-        // this.addChild(sp, 0, 1);
+        var bg = new cc.Sprite(res.wallBg_png);
+        bg.scale =0.2;
+        bg.setPosition(250,305)
+        this.addChild(bg, 0, 1);
 
-        var logo = new cc.Sprite(res.gameVictory_png);
-        logo.attr({
-            anchorX: 0,
-            anchorY: 0,
-            x: 40,
-            y: 450,
-            scale: MW.SCALE
-        });
-        this.addChild(logo,10,1);
+        var sp = new cc.Sprite(res.gameVictory_png);
+        sp.setPosition(245,570)
+        sp.scale = 0.4;
+        this.addChild(sp, 1, 1);
 
         var singalHeight = MW.menuHeight;
         var singalWidth = MW.menuWidth;
@@ -42,11 +36,17 @@ var GameVictory = cc.Layer.extend({
         var menu = new cc.Menu(playAgain);
         this.addChild(menu, 1, 2);
         menu.x = winSize.width / 2;
-        menu.y = 300;
+        menu.y = 170;
 
-        var lbScore = new cc.LabelTTF("Your time: "+MW.TIME,"Arial Bold",24);
+        var lbScore = new cc.LabelTTF("Your time: "+MW.TIME+" s","Arial Bold",24);
         lbScore.x = 240;
-        lbScore.y = 370;
+        lbScore.y = 430;
+        lbScore.color = cc.color(255,0,0);
+        this.addChild(lbScore,10);
+
+        var lbScore = new cc.LabelTTF("Mode: " + MW.MODE_NAME[MW.CURRENT_MODE] + " - " + MW.MOVE_PARAMS[MW.POKEMON_MOVE].name,"Arial Bold",24);
+        lbScore.x = 240;
+        lbScore.y = 385;
         lbScore.color = cc.color(255,0,0);
         this.addChild(lbScore,10);
 

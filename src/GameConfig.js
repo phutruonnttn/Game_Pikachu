@@ -1,36 +1,37 @@
 var MW = MW || {};
 
 MW.TIME = 0
+MW.TIME_COUNT_DOWN = 300
 
 // Show board
-MW.NROWS = 8;
-MW.NCOLUMNS = 8;
+MW.NROWS = 2;
+MW.NCOLUMNS = 2;
 // Max 32
-MW.NTYPES = 8;
+MW.NTYPES = 2;
 // MW.NROWS * MW.NCOLUMNS = MW.NTYPES * MW.N_EACH_OF_TYPE
-MW.N_EACH_OF_TYPE = 8;
+MW.N_EACH_OF_TYPE = 2;
 
 // Pokemon move
 MW.POKEMON_MOVE = 0
 MW.MOVE_PARAMS = [
     //dont move
-    {"name": "None"},
+    {"name": "Static Board"},
     //move up
-    {"name": "Up","splitDirection": 1, "direction": [0]},
+    {"name": "Move Up","splitDirection": 1, "direction": [0]},
     //move down
-    {"name": "Down","splitDirection": 1, "direction": [1]},
+    {"name": "Move Down","splitDirection": 1, "direction": [1]},
     //move right
-    {"name": "Right","splitDirection": 0, "direction": [1]},
+    {"name": "Move Right","splitDirection": 0, "direction": [1]},
     //move left
-    {"name": "Left","splitDirection": 0, "direction": [0]},
+    {"name": "Move Left","splitDirection": 0, "direction": [0]},
     //split up and down
-    {"name": "Split top, bottom","splitDirection": 1, "direction": [0,1]},
+    {"name": "Split Top, Bottom","splitDirection": 1, "direction": [0,1]},
     //split right and left
-    {"name": "Split right, left","splitDirection": 0, "direction": [0,1]},
+    {"name": "Split Right, Left","splitDirection": 0, "direction": [0,1]},
     //converge from top and bottom
-    {"name": "Converge top, bottom","splitDirection": 1, "direction": [1,0]},
+    {"name": "Converge Top, Bottom","splitDirection": 1, "direction": [1,0]},
     //converge from right and left
-    {"name": "Converge right, left","splitDirection": 0, "direction": [1,0]},
+    {"name": "Converge Right, Left","splitDirection": 0, "direction": [1,0]},
 ]
 MW.DONT_MOVE = 0
 MW.MOVE_UP = 1
@@ -54,6 +55,9 @@ MW.DURATION_MOVE_POKEMONS = 0.2
 MW.SPACE_EACH_SIDE = 1
 
 MW.CURRENT_MODE = 0
+MW.MODE_NAME = [
+    "Easy","Normal","Hard"
+]
 // Easy mode
 MW.INDEX_EASY = 0;
 MW.NROWS_EASY = 8;

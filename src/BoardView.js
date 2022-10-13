@@ -5,7 +5,7 @@ var BoardView = cc.Layer.extend({
     // _height: Độ dài của board view
     // pokemonImageTable: Bảng row x column sprite của từng pokemon
 
-    createBoardView: function (board){
+    createBoardView: function (board, timer){
         let boardView = new BoardView();
         boardView.board = board;
         boardView.squareSize = 0
@@ -13,7 +13,8 @@ var BoardView = cc.Layer.extend({
         boardView._height = 0
         boardView.pokemonImageTable = {}
         boardView.checkExistSolution()
-        boardView.showBoard();
+        boardView.showBoard()
+        boardView.timer = timer
         return boardView;
     },
 
@@ -177,6 +178,9 @@ var BoardView = cc.Layer.extend({
     },
 
     checkExistSolution: function (){
+        if (this.board.countRemainingPokemon == 0) {
+            this.onGameVictory()
+        }
         var flag = false
         if (MW.POKEMON_MOVE != MW.DONT_MOVE) {
             while (!this.board.checkExistSolutionMovableInBoard()) {
@@ -229,7 +233,6 @@ var BoardView = cc.Layer.extend({
         for (var i=0; i<this.board.getNRows(); i++){
             for (var j=0; j<this.board.getNColumns(); j++){
                 if (afterPosition[i][j].x != -1 ) {
-                    //tmpImageTable[i][j].positonInBoard = cc.p(afterPosition[i][j].x, afterPosition[i][j].y)
                     tmpImageTable[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemonImageTable[i][j]
                     tmpImageTable[afterPosition[i][j].x][afterPosition[i][j].y].positonInBoard = cc.p(afterPosition[i][j].x, afterPosition[i][j].y)
 
@@ -239,5 +242,14 @@ var BoardView = cc.Layer.extend({
             }
         }
         this.pokemonImageTable = tmpImageTable.map((value) => value.slice())
+    },
+
+    onGameVictory: function () {
+        MW.TIME = Math.floor((100-this.timer.getPercentage())*MW.TIME_COUNT_DOWN)/100
+        cc.audioEngine.stopAllEffects();
+        var scene = new cc.Scene();
+        scene.addChild(new GameVictory())
+        scene.addChild(new GameControlMenu());
+        cc.director.runScene(new cc.TransitionFade(1.2, scene));
     }
 })
