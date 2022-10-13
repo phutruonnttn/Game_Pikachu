@@ -20,7 +20,7 @@ var BoardView = cc.Layer.extend({
     showBoard: function (){
         this.removeAllChildren(true)
         let visibleSize = cc.Director.getInstance().getVisibleSize();
-        this.squareSize = visibleSize.width / (this.board.getNColumns() + 2);
+        this.squareSize = visibleSize.width / (this.board.getNColumns() + 2 * MW.SPACE_EACH_SIDE);
         this._width = this.squareSize * this.board.getNColumns();
         this._height = this.squareSize * this.board.getNRows();
         this.setContentSize(this._width, this._height);
@@ -145,10 +145,10 @@ var BoardView = cc.Layer.extend({
         //1: Hieu ung noi 2 pokemon
         var connectEffect = this.getConnectEffect(x,y,_x,_y)
         //2: Hieu ung lam mo 2 pokemon
-        var pokemonFade1 = cc.TargetedAction.create(this.pokemonImageTable[x][y], cc.FadeOut.create(MW.DURATION_CONNECT_POKEMONS))
-        var pokemonFade2 = cc.TargetedAction.create(this.pokemonImageTable[_x][_y], cc.FadeOut.create(MW.DURATION_CONNECT_POKEMONS))
-        var pokemonScale1 = cc.TargetedAction.create(this.pokemonImageTable[x][y], cc.ScaleTo.create(MW.DURATION_CONNECT_POKEMONS,0.0))
-        var pokemonScale2 = cc.TargetedAction.create(this.pokemonImageTable[_x][_y], cc.ScaleTo.create(MW.DURATION_CONNECT_POKEMONS,0.0))
+        var pokemonFade1 = cc.TargetedAction.create(this.pokemonImageTable[x][y], cc.FadeOut.create(MW.DURATION_FADE_POKEMONS))
+        var pokemonFade2 = cc.TargetedAction.create(this.pokemonImageTable[_x][_y], cc.FadeOut.create(MW.DURATION_FADE_POKEMONS))
+        var pokemonScale1 = cc.TargetedAction.create(this.pokemonImageTable[x][y], cc.ScaleTo.create(MW.DURATION_FADE_POKEMONS,0.0))
+        var pokemonScale2 = cc.TargetedAction.create(this.pokemonImageTable[_x][_y], cc.ScaleTo.create(MW.DURATION_FADE_POKEMONS,0.0))
         var effectSpawn = cc.spawn(pokemonFade1, pokemonScale1,pokemonFade2,pokemonScale2)
         //3: Xoa 2 pokemon
         var removePokemon = cc.callFunc(function (target){
@@ -161,11 +161,11 @@ var BoardView = cc.Layer.extend({
         }.bind(this))
         //5: Board run and Sequence
         var sequence
-        if (MW.POKEMON_MOVE != 0) {
-            var moveUp = cc.callFunc(function (targer) {
-                this.moveUp(x,y,_x,_y);
+        if (MW.POKEMON_MOVE != MW.DONT_MOVE) {
+            var moveBoard = cc.callFunc(function (targer) {
+                this.moveBoard(x,y,_x,_y);
             }.bind(this))
-            sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, moveUp,checkSolution)
+            sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, moveBoard, checkSolution)
         } else {
             sequence = cc.sequence(connectEffect, effectSpawn, removePokemon, checkSolution)
         }
@@ -175,7 +175,7 @@ var BoardView = cc.Layer.extend({
 
     checkExistSolution: function (){
         var flag = false
-        if (MW.POKEMON_MOVE != 0) {
+        if (MW.POKEMON_MOVE != MW.DONT_MOVE) {
             while (!this.board.checkExistSolutionMovableInBoard()) {
                 this.board.generateTablePokemons()
                 flag = true
@@ -196,7 +196,7 @@ var BoardView = cc.Layer.extend({
         var emitter = new cc.ParticleFlower()
         this.addChild(emitter)
         emitter.setScale(0.5)
-        var duration = 0.5
+        var duration = MW.DURATION_CONNECT_POKEMONS
         emitter.duration = duration
         emitter.setPosition(this.positionOf(path[0].x, path[0].y))
         var actions = []
@@ -223,33 +223,39 @@ var BoardView = cc.Layer.extend({
 
     showHint: function (){
         this.removeChoosePokemonEffect()
-        if (MW.POKEMON_MOVE != 0) {
-
+        var hint
+        if (MW.POKEMON_MOVE != MW.DONT_MOVE) {
+            hint = this.board.getHintMovableBoard()
         } else{
-            for (var i = 0; i < this.board.getNRows(); i++) {
-                for (var j = 0; j < this.board.getNColumns(); j++) {
-                    if (this.board.getPokemon(i, j) !== -1) {
-                        if (this.board.listCanConnect[i][j].length > 0) {
-                            var p = this.board.listCanConnect[i][j][0]
-                            this.createChoosePokemonEffect(this.pokemonImageTable[i][j])
-                            this.createChoosePokemonEffect(this.pokemonImageTable[p.x][p.y])
-                            return
-                        }
-                    }
-                }
-            }
+            hint = this.board.getHintUnmovableBoard()
         }
+        var p1 = hint.first
+        var p2 = hint.second
+        this.createChoosePokemonEffect(this.pokemonImageTable[p1.x][p1.y])
+        this.createChoosePokemonEffect(this.pokemonImageTable[p2.x][p2.y])
     },
 
-    moveUp: function (x,y,_x,_y){
-        var afterPosition = this.board.boardUp(x,y,_x,_y)
+    moveBoard: function (x,y,_x,_y){
+        var afterPosition
+        if (MW.POKEMON_MOVE == MW.MOVE_UP) {
+            afterPosition = this.board.boardUp(x,y,_x,_y)
+        } else if (MW.POKEMON_MOVE == MW.MOVE_DOWN){
+            afterPosition = this.board.boardDown(x,y,_x,_y)
+            return//delete after implement code down
+        } else if (MW.POKEMON_MOVE == MW.MOVE_RIGHT){
+            afterPosition = this.board.boardRight(x,y,_x,_y)
+            return//delete after implement code right
+        } else if (MW.POKEMON_MOVE == MW.MOVE_LEFT){
+            afterPosition = this.board.boardLeft(x,y,_x,_y)
+            return//delete after implement code left
+        }
         for (var i=0; i<this.board.getNRows(); i++){
             for (var j=0; j<this.board.getNColumns(); j++){
                 if (afterPosition[i][j].x != -1 ) {
                     this.pokemonImageTable[afterPosition[i][j].x][afterPosition[i][j].y] = this.pokemonImageTable[i][j]
                     this.pokemonImageTable[i][j].positonInBoard = cc.p(afterPosition[i][j].x, afterPosition[i][j].y)
-                    var moveUp = cc.moveTo(MW.DURATION_MOVE_POKEMONS, this.positionOf(afterPosition[i][j].x,afterPosition[i][j].y))
-                    this.pokemonImageTable[i][j].runAction(moveUp)
+                    var move = cc.moveTo(MW.DURATION_MOVE_POKEMONS, this.positionOf(afterPosition[i][j].x,afterPosition[i][j].y))
+                    this.pokemonImageTable[i][j].runAction(move)
                 }
             }
         }

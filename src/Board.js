@@ -105,14 +105,6 @@ let Board = cc.Class.extend( {
         }
     },
 
-    boardUpdatePosition: function (tmpPokemon) {
-        for (var i = 0; i < this.n_rows; i++) {
-            for (var j = 0; j < this.n_columns; j++) {
-                this.addPokemon(i,j,tmpPokemon[i][j])
-            }
-        }
-    },
-
     removePokemon: function (x,y){
         this.countType[this.pokemonTypeTable[x][y]-1]--
         this.countRemainingPokemon--
@@ -182,6 +174,48 @@ let Board = cc.Class.extend( {
             }
         }
         return false
+    },
+
+    getHintMovableBoard: function (){
+        if (this.countRemainingPokemon === 0) return true
+        var e = this.initTableForBFS()
+        for (var i = 0; i < this.getNRows(); i++) {
+            for (var j = 0; j < this.getNColumns(); j++){
+                if (this.getPokemon(i,j) !== -1) {
+                    var stepCount = this.breadthFirstSearch(cc.p(-1,-1),cc.p(i+1,j+1),e, false)
+                    for (var i2 = 0; i2 < this.getNRows(); i2++) {
+                        for (var j2 = 0; j2 < this.getNColumns(); j2++) {
+                            if (this.getPokemon(i2,j2) == this.getPokemon(i,j) && (i!=i2 || j!=j2)) {
+                                if ((i2==i-1 && j2==j) || (i2==i+1 && j2==j) || (i2==i && j2==j-1) || (i2==i && j2==j+1)){
+                                    // return [cc.p(i,j),cc.p(i2,j2)]
+                                    return {"first": cc.p(i,j), "second": cc.p(i2,j2)}
+                                }
+                                var p = cc.p(i2+1,j2+1)
+                                var stepTo = Math.min(stepCount[p.x][p.y],stepCount[p.x-1][p.y]+1,stepCount[p.x][p.y-1]+1,
+                                    stepCount[p.x+1][p.y]+1,stepCount[p.x][p.y+1]+1)
+                                if (MW.MIN_STEP_COUNT<=stepTo && stepTo<=MW.MAX_STEP_COUNT) {
+                                    //return [cc.p(i,j),cc.p(i2,j2)]
+                                    return {"first": cc.p(i,j), "second": cc.p(i2,j2)}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    getHintUnmovableBoard: function (){
+        for (var i = 0; i < this.getNRows(); i++) {
+            for (var j = 0; j < this.getNColumns(); j++) {
+                if (this.getPokemon(i, j) !== -1) {
+                    if (this.listCanConnect[i][j].length > 0) {
+                        var p = this.listCanConnect[i][j][0]
+                        return {"first": cc.p(i,j), "second": cc.p(p.x,p.y)}
+                    }
+                }
+            }
+        }
     },
 
     checkExistSolutionUnmovableInBoard: function (){
@@ -280,7 +314,7 @@ let Board = cc.Class.extend( {
         }
         var column = [y,_y]
         if (y==_y) column.pop()
-        var row = [x, _x]
+        //var row = [x, _x]
         for (var i = 0; i< column.length; i++){
             var current = -1
             var run = 0
@@ -295,6 +329,18 @@ let Board = cc.Class.extend( {
             }
         }
         return afterPosition
+    },
+
+    boardDown: function (){
+        cc.log("down")
+    },
+
+    boardRight: function (){
+        cc.log("right")
+    },
+
+    boardLeft: function (){
+        cc.log("left")
     },
 
     getPreviousX: function (){
