@@ -1,15 +1,24 @@
 var MW = MW || {};
 
 MW.TIME = 0
-MW.TIME_COUNT_DOWN = 300
+MW.TIME_COUNT_DOWN = 60
 
-// Show board
-MW.NROWS = 4;
-MW.NCOLUMNS = 4;
-// Max 32
-MW.NTYPES = 4;
-// MW.NROWS * MW.NCOLUMNS = MW.NTYPES * MW.N_EACH_OF_TYPE
-MW.N_EACH_OF_TYPE = 4;
+// Mode
+MW.NROWS = 8;
+MW.NCOLUMNS = 8;
+    // Max 32
+MW.NTYPES = 8;
+    // MW.NROWS * MW.NCOLUMNS = MW.NTYPES * MW.N_EACH_OF_TYPE
+MW.N_EACH_OF_TYPE = 8;
+MW.CURRENT_MODE = 0
+MW.MODE_PARAMS = [
+    {"name": "Easy", "row": 8, "column": 8, "typeNumber": 8, "eachOfType": 8},
+    {"name": "Normal", "row": 10, "column": 10, "typeNumber": 25, "eachOfType": 4},
+    {"name": "Hard", "row": 12, "column": 12, "typeNumber": 36, "eachOfType": 4},
+]
+MW.INDEX_EASY = 0;
+MW.INDEX_NORMAL = 1;
+MW.INDEX_HARD = 2;
 
 // Pokemon move
 MW.POKEMON_MOVE = 0
@@ -53,31 +62,6 @@ MW.DURATION_CONNECT_POKEMONS = 0.5
 MW.DURATION_FADE_POKEMONS = 0.3
 MW.DURATION_MOVE_POKEMONS = 0.2
 MW.SPACE_EACH_SIDE = 1
-
-MW.CURRENT_MODE = 0
-MW.MODE_NAME = [
-    "Easy","Normal","Hard"
-]
-// Easy mode
-MW.INDEX_EASY = 0;
-MW.NROWS_EASY = 8;
-MW.NCOLUMNS_EASY = 8;
-MW.NTYPES_EASY = 8;
-MW.N_EACH_OF_TYPE_EASY = 8;
-
-// Normal mode
-MW.INDEX_NORMAL = 1;
-MW.NROWS_NORMAL = 10;
-MW.NCOLUMNS_NORMAL = 10;
-MW.NTYPES_NORMAL = 25;
-MW.N_EACH_OF_TYPE_NORMAL = 4;
-
-// Hard mode
-MW.INDEX_HARD = 2;
-MW.NROWS_HARD = 12;
-MW.NCOLUMNS_HARD = 12;
-MW.NTYPES_HARD = 36;
-MW.N_EACH_OF_TYPE_HARD = 4;
 
 // Choose effect
 MW.DURATION_CHOOSE_EFFECT = 0.3

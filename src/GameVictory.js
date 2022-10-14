@@ -44,7 +44,7 @@ var GameVictory = cc.Layer.extend({
         lbScore.color = cc.color(255,0,0);
         this.addChild(lbScore,10);
 
-        var lbScore = new cc.LabelTTF("Mode: " + MW.MODE_NAME[MW.CURRENT_MODE] + " - " + MW.MOVE_PARAMS[MW.POKEMON_MOVE].name,"Arial Bold",24);
+        var lbScore = new cc.LabelTTF("Mode: " + MW.MODE_PARAMS[MW.CURRENT_MODE].name + " - " + MW.MOVE_PARAMS[MW.POKEMON_MOVE].name,"Arial Bold",24);
         lbScore.x = 240;
         lbScore.y = 385;
         lbScore.color = cc.color(255,0,0);

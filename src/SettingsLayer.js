@@ -110,24 +110,11 @@ var SettingsLayer = cc.Layer.extend({
         }
     },
     onModeControl:function(){
-        var selectedIndex = this.getSelectedIndex()
-        MW.CURRENT_MODE = selectedIndex
-        if (selectedIndex == MW.INDEX_EASY) {
-            MW.NROWS = MW.NROWS_EASY
-            MW.NCOLUMNS = MW.NCOLUMNS_EASY;
-            MW.NTYPES = MW.NTYPES_EASY;
-            MW.N_EACH_OF_TYPE = MW.N_EACH_OF_TYPE_EASY;
-        } else if (selectedIndex == MW.INDEX_NORMAL){
-            MW.NROWS = MW.NROWS_NORMAL
-            MW.NCOLUMNS = MW.NCOLUMNS_NORMAL
-            MW.NTYPES = MW.NTYPES_NORMAL
-            MW.N_EACH_OF_TYPE = MW.N_EACH_OF_TYPE_NORMAL
-        } else if (selectedIndex == MW.INDEX_HARD) {
-            MW.NROWS = MW.NROWS_HARD
-            MW.NCOLUMNS = MW.NCOLUMNS_HARD
-            MW.NTYPES = MW.NTYPES_HARD
-            MW.N_EACH_OF_TYPE = MW.N_EACH_OF_TYPE_HARD
-        }
+        MW.CURRENT_MODE = this.getSelectedIndex()
+        MW.NROWS = MW.MODE_PARAMS[MW.CURRENT_MODE].row
+        MW.NCOLUMNS = MW.MODE_PARAMS[MW.CURRENT_MODE].column
+        MW.NTYPES = MW.MODE_PARAMS[MW.CURRENT_MODE].typeNumber
+        MW.N_EACH_OF_TYPE = MW.MODE_PARAMS[MW.CURRENT_MODE].eachOfType
     },
     onMovableControl: function (){
         MW.POKEMON_MOVE = this.getSelectedIndex()

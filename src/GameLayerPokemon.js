@@ -6,10 +6,18 @@ var GameLayerPokemon = cc.Layer.extend({
         this.init();
     },
     init:function () {
+        this.showLabelMode();
         this.showProgressTimer();
         this.showBoard();
         this.showHintButton();
         return true;
+    },
+    showLabelMode: function (){
+        var lbScore = new cc.LabelTTF("Mode: " + MW.MODE_PARAMS[MW.CURRENT_MODE].name + " - " + MW.MOVE_PARAMS[MW.POKEMON_MOVE].name,"Arial Bold",24);
+        lbScore.x = 240;
+        lbScore.y = 700;
+        lbScore.color = cc.color(255,0,0);
+        this.addChild(lbScore,10);
     },
     showBoard: function (){
         var count = []
@@ -53,7 +61,7 @@ var GameLayerPokemon = cc.Layer.extend({
         hint.setColor(cc.color(MW.WHITE_COLOR));
         let visibleSize = cc.Director.getInstance().getVisibleSize();
         let board = this.boardView.getBoundingBox()
-        hint.setPosition(visibleSize.width*3/4, board.y + board.height +  board.y/ 2)
+        hint.setPosition(visibleSize.width/2, board.y + board.height +  board.y/ 2)
         var menu = new cc.Menu(hint);
         menu.x = 0;
         menu.y = 0;
