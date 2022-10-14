@@ -148,6 +148,72 @@ let Board = cc.Class.extend( {
     canConnect: function (preX, preY, x , y) {
         var path = this.findPath(preX, preY, x, y)
         return path.length >= MW.MIN_PATH_LENGTH && path.length <= MW.MAX_PATH_LENGTH
+        // Thuat toan nhanh hon:
+        // //for theo chieu ngang
+        // var minXofP1 = preX
+        // var maxXofP1 = preX
+        // var minXofP2 = x
+        // var maxXofP2 = x
+        // for (var i = preX-1; i>=-1; i--){
+        //     if (i==-1) {
+        //         minXofP1 = i
+        //         break
+        //     }
+        //     if (this.pokemonTypeTable(i,preY) == -1){
+        //         minXofP1 = i
+        //     } else {
+        //         break
+        //     }
+        // }
+        // for (var i = pre+1; i<=this.getNRows; i++) {
+        //     if (i==this.getNRows) {
+        //         maxXofP1 = i
+        //         break
+        //     }
+        //     if (this.pokemonTypeTable(i,preY) == -1){
+        //         maxXofP1 = i
+        //     } else {
+        //         break
+        //     }
+        // }
+        // for (var i = x-1; i>=-1; i--){
+        //     if (i==-1) {
+        //         minXofP2 = i
+        //         break
+        //     }
+        //     if (this.pokemonTypeTable(i,y) == -1){
+        //         minXofP2 = i
+        //     } else {
+        //         break
+        //     }
+        // }
+        // for (var i = x+1; i<=this.getNRows; i++) {
+        //     if (i==this.getNRows) {
+        //         maxXofP2 = i
+        //         break
+        //     }
+        //     if (this.pokemonTypeTable(i,y) == -1){
+        //         maxXofP2 = i
+        //     } else {
+        //         break
+        //     }
+        // }
+        // var fromX = Math.max(minXofP1,minXofP2)
+        // var toX = Math.min(maxXofP1, maxXofP2)
+        // for (var i = fromX; i<=toX; i++){
+        //     if (Math.min(preY,y)+1==Math.max(preY,y)) {
+        //         return true
+        //     }
+        //     for (var j = Math.min(preY,y)+1; j<=Math.max(preY,y)-1; j++){
+        //         if (this.getPokemon(i,j) != -1) {
+        //             break
+        //         }
+        //         if (j == Math.max(preY,y)) {
+        //             return true
+        //         }
+        //     }
+        // }
+        // //for theo chieu doc tiep
     },
 
     checkExistSolutionMovableInBoard: function () {
