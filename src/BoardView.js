@@ -15,7 +15,39 @@ var BoardView = cc.Layer.extend({
         boardView.checkExistSolution()
         boardView.showBoard()
         boardView.timer = timer
+        boardView.addTouchListener()
         return boardView;
+    },
+
+    addTouchListener: function (){
+        var self = this
+        var listener = cc.EventListener.create({
+            event: cc.EventListener.TOUCH_ONE_BY_ONE,
+            swallowTouches: true,
+            onTouchBegan: function (touch, event) {
+                var px = self.board.getNRows() - (Math.floor((touch.getLocation().y-
+                    (cc.Director.getInstance().getVisibleSize().height - self.getContentSize().height) / 2)/self.squareSize)+1)
+                var py = Math.floor((touch.getLocation().x-self.squareSize*MW.SPACE_EACH_SIDE)/self.squareSize)
+                if (px>=0 && py>=0 && px<self.board.getNColumns() && py<self.board.getNRows() && self.board.getPokemon(px,py) != -1) {
+                    var p = cc.p(px,py)
+                    self.removeChoosePokemonEffect();
+                    if (self.board.selectPokemon(p.x, p.y)){
+                        self.connectPokemons(self.board.getPreviousX(), self.board.getPreviousY(),p.x,p.y)
+                        self.board.setPreviousX(-1)
+                        self.board.setPreviousY(-1)
+                        self.soundRemovePokemonEffect()
+                    } else {
+                        self.soundChoosePokemonEffect()
+                        self.createChoosePokemonEffect(self.pokemonImageTable[p.x][p.y])
+                        self.board.setPreviousX(p.x)
+                        self.board.setPreviousY(p.y)
+                    }
+                    return true
+                }
+                return false;
+            }
+        })
+        cc.eventManager.addListener(listener, this)
     },
 
     showBoard: function (){
@@ -44,37 +76,6 @@ var BoardView = cc.Layer.extend({
         var position = this.positionOf(row, column)
         pokemon.setPosition(position);
         pokemon.positonInBoard = cc.p(row, column)
-        var self = this
-        var listener = cc.EventListener.create({
-            event: cc.EventListener.TOUCH_ONE_BY_ONE,
-            swallowTouches: true,
-            onTouchBegan: function (touch, event) {
-                var touchLocation = cc.p(touch.getLocation().x - self.squareSize, touch.getLocation().y - (cc.Director.getInstance().getVisibleSize().height-self._height)/2)
-                var target = event.getCurrentTarget() //target: pokemon
-                if (cc.rectContainsPoint(target.getBoundingBox(), touchLocation)) {
-                    var p = target.positonInBoard
-                    self.removeChoosePokemonEffect();
-                    if (self.board.selectPokemon(p.x, p.y)){
-                        self.connectPokemons(self.board.getPreviousX(), self.board.getPreviousY(),p.x,p.y)
-                        self.board.setPreviousX(-1)
-                        self.board.setPreviousY(-1)
-                        self.soundRemovePokemonEffect()
-                    } else {
-                        self.soundChoosePokemonEffect()
-                        self.createChoosePokemonEffect(self.pokemonImageTable[p.x][p.y])
-                        self.board.setPreviousX(p.x)
-                        self.board.setPreviousY(p.y)
-                    }
-                    //nuot su kien
-                    return true
-                } else {
-                    //chuyen su kien cho sprite pokemon tiep theo
-                    return false;
-                }
-            }
-        })
-        pokemon.listener = listener
-        cc.eventManager.addListener(listener, pokemon)
         return pokemon;
     },
 
