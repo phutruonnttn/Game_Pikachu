@@ -8,8 +8,22 @@ let Board = cc.Class.extend( {
     // types: Số lượng type pokemon
     // typePositions: Vị trí từng pokemon theo mỗi type
     // countRemainingPokemon: Số pokemon còn lại trên bàn chơi
-    // listCanConnect[i][j]: Tọa độ các pokemon khác mà pokemon[i][j] kết nối được
+    // listCanConnect[i][j]: Tọa độ các pokemon khác mà pokemon[i][j] kết nối được (cùng loại)
     // countRemainingOfListCanConnect: số cặp còn lại trong listCanConnect
+    // preSumVertical[i][j]: tính tổng theo chiều dọc tại từng cột để hỗ trợ hàm canConnect
+    //                        preSumVertical[i][j] = pokemonTypeTable[0][j] + pokemonTypeTable[1][j]
+    //                                               + ... + pokemonTypeTable[i][j]
+    //                       cập nhật lại mỗi lần remove
+    // preSumHorizontal[][]: tính tổng theo chiều ngang tại từng dòng để hỗ trợ hàm canConnect
+    //                        preSumVertical[i][j] = pokemonTypeTable[i][0] + pokemonTypeTable[i][1]
+    //                                               + ... + pokemonTypeTable[i][j]
+    //                       cập nhật lại mỗi lần remove
+
+
+    // **********************************************************************************************
+    // Chưa hoàn thành updatePreSumArraysAfterMove: bị vướng mỗi lần cập nhật 2 mảng preSumVertical và
+    // preSumVertical sau khi move board -> chưa áp dụng mảng sum để tối ưu hàm canconect trong trường
+    // hợp board move được
 
     ctor: function (n_rows, n_column, n_types, count){
         this.n_rows = n_rows;
@@ -23,12 +37,18 @@ let Board = cc.Class.extend( {
         this.countRemainingPokemon = n_rows * n_column
         this.listCanConnect = {}
         this.countRemainingOfListCanConnect = 0
+        this.preSumVertical = {}
+        this.preSumHorizontal = {}
         for (var i = 0; i < n_rows; i++){
             this.pokemonTypeTable[i] = [];
             this.listCanConnect[i] = []
+            this.preSumVertical[i] = []
+            this.preSumHorizontal[i] = []
             for (var j = 0; j < n_column; j++){
                 this.pokemonTypeTable[i][j] = MW.FLAG_NUMBER;
                 this.listCanConnect[i][j] = []
+                this.preSumVertical[i][j] = 0
+                this.preSumHorizontal[i][j] = 0
             }
         }
         this.generateTablePokemons()
@@ -92,7 +112,19 @@ let Board = cc.Class.extend( {
         }
         for (var i = 0; i < this.n_rows; i++) {
             for (var j = 0; j < this.n_columns; j++) {
+                if (i==0){
+                    this.preSumVertical[i][j] = 0
+                } else {
+                    this.preSumVertical[i][j] = this.preSumVertical[i-1][j]
+                }
+                if (j==0){
+                    this.preSumHorizontal[i][j] = 0
+                } else {
+                    this.preSumHorizontal[i][j] = this.preSumHorizontal[i][j - 1]
+                }
                 if (this.pokemonTypeTable[i][j] !== -1) {
+                    this.preSumVertical[i][j]++
+                    this.preSumHorizontal[i][j]++
                     var type;
                     do {
                         type = Math.floor(Math.random() * this.types) % this.types;
@@ -109,24 +141,44 @@ let Board = cc.Class.extend( {
         this.countType[this.pokemonTypeTable[x][y]-1]--
         this.countRemainingPokemon--
         this.pokemonTypeTable[x][y] = -1
-        //Cap nhat lai mang listCanConnect
-        for (var i = 0; i< this.listCanConnect[x][y].length; i++){
-            var p = this.listCanConnect[x][y][i]
-            var listP = this.listCanConnect[p.x][p.y]
-            var delIndex = -1
-            for (var j = 0; j<listP.length; j++){
-                if (listP[j].x == x && listP[j].y == y) {
-                    delIndex = j;
-                    break
+        if (MW.POKEMON_MOVE == MW.DONT_MOVE) {
+            //Cap nhat lai mang listCanConnect
+            for (var i = 0; i < this.listCanConnect[x][y].length; i++) {
+                var p = this.listCanConnect[x][y][i]
+                var listP = this.listCanConnect[p.x][p.y]
+                var delIndex = -1
+                for (var j = 0; j < listP.length; j++) {
+                    if (listP[j].x == x && listP[j].y == y) {
+                        delIndex = j;
+                        break
+                    }
+                }
+                if (delIndex != -1) {
+                    this.listCanConnect[p.x][p.y].splice(delIndex, 1)
+                    this.countRemainingOfListCanConnect--
                 }
             }
-            if (delIndex!=-1) {
-                this.listCanConnect[p.x][p.y].splice(delIndex,1)
-                this.countRemainingOfListCanConnect--
+            this.countRemainingOfListCanConnect = this.countRemainingOfListCanConnect - this.listCanConnect[x][y].length
+            this.listCanConnect[x][y].splice(0, this.listCanConnect[x][y].length)
+
+            //Cap nhat mang preSumVertical va preSumHorizontal
+            for (var i = x; i<this.getNRows(); i++) {
+                this.preSumVertical[i][y]--
+            }
+            for (var i = y; i<this.getNColumns(); i++){
+                this.preSumHorizontal[x][i]--
             }
         }
-        this.countRemainingOfListCanConnect = this.countRemainingOfListCanConnect - this.listCanConnect[x][y].length
-        this.listCanConnect[x][y].splice(0,this.listCanConnect[x][y].length)
+    },
+
+    //Cap nhat mang preSumVertical va preSumHorizontal
+    updatePreSumArraysAfterMove: function (x,y){
+        // for (var i = x; i<this.getNRows(); i++) {
+        //     this.preSumVertical[i][y]--
+        // }
+        // for (var i = y; i<this.getNColumns(); i++){
+        //     this.preSumHorizontal[x][i]--
+        // }
     },
 
     selectPokemon: function (x,y){
@@ -145,75 +197,120 @@ let Board = cc.Class.extend( {
         return true;
     },
 
+    // Tim toa do nho nhat theo chieu doc ma 1 o co the di den
+    findMinCoordinateXOfPoint: function (x,y){
+        var res = x
+        for (var i = x-1; i>=-1; i--){
+            if (i==-1) {
+                return i
+            }
+            if (this.getPokemon(i,y) == -1){
+                res = i
+            } else {
+                return res
+            }
+        }
+        return res
+    },
+
+    // Tim toa do lon nhat theo chieu doc ma 1 o co the di den
+    findMaxCoordinateXOfPoint: function (x,y){
+        var res = x
+        for (var i = x+1; i<=this.getNRows(); i++) {
+            if (i==this.getNRows()) {
+                return i
+            }
+            if (this.getPokemon(i,y) == -1){
+                res = i
+            } else {
+                return res
+            }
+        }
+        return res
+    },
+
+    // Tim toa do nho nhat theo chieu ngang ma 1 o co the di den
+    findMinCoordinateYOfPoint: function (x,y){
+        var res = y
+        for (var i = y-1; i>=-1; i--){
+            if (i==-1) {
+                return i
+            }
+            if (this.getPokemon(x,i) == -1){
+                res = i
+            } else {
+                return res
+            }
+        }
+        return res
+    },
+
+    // Tim toa do lon nhat theo chieu ngang ma 1 o co the di den
+    findMaxCoordinateYOfPoint: function (x,y){
+        var res = y
+        for (var i = y+1; i<=this.getNColumns(); i++) {
+            if (i==this.getNColumns()) {
+                return i
+            }
+            if (this.getPokemon(x,i) == -1){
+                res = i
+            } else {
+                return res
+            }
+        }
+        return res
+    },
+
     canConnect: function (preX, preY, x , y) {
-        var path = this.findPath(preX, preY, x, y)
-        return path.length >= MW.MIN_PATH_LENGTH && path.length <= MW.MAX_PATH_LENGTH
-        // Thuat toan nhanh hon:
-        // //for theo chieu ngang
-        // var minXofP1 = preX
-        // var maxXofP1 = preX
-        // var minXofP2 = x
-        // var maxXofP2 = x
-        // for (var i = preX-1; i>=-1; i--){
-        //     if (i==-1) {
-        //         minXofP1 = i
-        //         break
-        //     }
-        //     if (this.pokemonTypeTable(i,preY) == -1){
-        //         minXofP1 = i
-        //     } else {
-        //         break
-        //     }
-        // }
-        // for (var i = pre+1; i<=this.getNRows; i++) {
-        //     if (i==this.getNRows) {
-        //         maxXofP1 = i
-        //         break
-        //     }
-        //     if (this.pokemonTypeTable(i,preY) == -1){
-        //         maxXofP1 = i
-        //     } else {
-        //         break
-        //     }
-        // }
-        // for (var i = x-1; i>=-1; i--){
-        //     if (i==-1) {
-        //         minXofP2 = i
-        //         break
-        //     }
-        //     if (this.pokemonTypeTable(i,y) == -1){
-        //         minXofP2 = i
-        //     } else {
-        //         break
-        //     }
-        // }
-        // for (var i = x+1; i<=this.getNRows; i++) {
-        //     if (i==this.getNRows) {
-        //         maxXofP2 = i
-        //         break
-        //     }
-        //     if (this.pokemonTypeTable(i,y) == -1){
-        //         maxXofP2 = i
-        //     } else {
-        //         break
-        //     }
-        // }
-        // var fromX = Math.max(minXofP1,minXofP2)
-        // var toX = Math.min(maxXofP1, maxXofP2)
-        // for (var i = fromX; i<=toX; i++){
-        //     if (Math.min(preY,y)+1==Math.max(preY,y)) {
-        //         return true
-        //     }
-        //     for (var j = Math.min(preY,y)+1; j<=Math.max(preY,y)-1; j++){
-        //         if (this.getPokemon(i,j) != -1) {
-        //             break
-        //         }
-        //         if (j == Math.max(preY,y)) {
-        //             return true
-        //         }
-        //     }
-        // }
-        // //for theo chieu doc tiep
+        // var path = this.findPath(preX, preY, x, y)
+        // return path.length >= MW.MIN_PATH_LENGTH && path.length <= MW.MAX_PATH_LENGTH
+
+        // Thuat toan nhanh hon: Truong hop xau nhat van la O(n^2)
+        // Xet cac LINE ngang
+        var minXofP1 = this.findMinCoordinateXOfPoint(preX,preY)
+        var maxXofP1 = this.findMaxCoordinateXOfPoint(preX,preY)
+        var minXofP2 = this.findMinCoordinateXOfPoint(x,y)
+        var maxXofP2 = this.findMaxCoordinateXOfPoint(x,y)
+        var fromX = Math.max(minXofP1,minXofP2)
+        var toX = Math.min(maxXofP1, maxXofP2)
+        for (var i = fromX; i<=toX; i++){
+            if (Math.min(preY,y)+1==Math.max(preY,y) || i == -1 || i == this.getNRows()) {
+                return true
+            }
+            //Moi line ngang kiem tra giua 2 diem co o nao can duong khong? O(n)
+            //Co the toi uu bang mang bam -> O(1)
+            for (var j = Math.min(preY,y)+1; j<=Math.max(preY,y)-1; j++){
+                if (this.getPokemon(i,j) != -1) {
+                    break
+                }
+                if (j == Math.max(preY,y)-1) {
+                    return true
+                }
+            }
+        }
+        //Xet cac LINE doc
+        var minYofP1 = this.findMinCoordinateYOfPoint(preX,preY)
+        var maxYofP1 = this.findMaxCoordinateYOfPoint(preX,preY)
+        var minYofP2 = this.findMinCoordinateYOfPoint(x,y)
+        var maxYofP2 = this.findMaxCoordinateYOfPoint(x,y)
+        var fromY = Math.max(minYofP1,minYofP2)
+        var toY = Math.min(maxYofP1, maxYofP2)
+        for (var i = fromY; i<=toY; i++){
+            if (Math.min(preX,x)+1==Math.max(preX,x) || i == -1 || i == this.getNColumns()) {
+                return true
+            }
+            //Moi line doc kiem tra giua 2 diem co o nao can duong khong? O(n)
+            //Co the toi uu bang mang bam -> O(1)
+            for (var j = Math.min(preX,x)+1; j<=Math.max(preX,x)-1; j++){
+                if (this.getPokemon(j,i) != -1) {
+                    break
+                }
+                if (j == Math.max(preX,x)-1) {
+                    return true
+                }
+            }
+        }
+        return false
     },
 
     checkExistSolutionMovableInBoard: function () {

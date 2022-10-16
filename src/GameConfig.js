@@ -4,12 +4,12 @@ MW.TIME = 0
 MW.TIME_COUNT_DOWN = 60
 
 // Mode
-MW.NROWS = 8;
-MW.NCOLUMNS = 8;
+MW.NROWS = 4;
+MW.NCOLUMNS = 4;
     // Max 32
-MW.NTYPES = 8;
+MW.NTYPES = 4;
     // MW.NROWS * MW.NCOLUMNS = MW.NTYPES * MW.N_EACH_OF_TYPE
-MW.N_EACH_OF_TYPE = 8;
+MW.N_EACH_OF_TYPE = 4;
 MW.CURRENT_MODE = 0
 MW.MODE_PARAMS = [
     {"name": "Easy", "row": 8, "column": 8, "typeNumber": 8, "eachOfType": 8},
