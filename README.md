@@ -2,7 +2,7 @@
 
 A classic tile-matching puzzle game inspired by the popular Pikachu game, built from scratch using JavaScript and Cocos2d-html5 framework. This project represents my first complete game development journey—from initial concept and asset sourcing to full implementation.
 
-![Game Demo](https://github.com/phutruonnttn/Game_Pikachu/assets/45969976/62948638-fd60-456b-a1af-81f79de52574)
+[![Game Demo](https://github.com/phutruonnttn/Game_Pikachu/assets/45969976/62948638-fd60-456b-a1af-81f79de52574)](https://github.com/phutruonnttn/Game_Pikachu/assets/45969976/62948638-fd60-456b-a1af-81f79de52574)
 
 ## 🎮 Overview
 
